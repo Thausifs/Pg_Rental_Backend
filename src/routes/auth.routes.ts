@@ -9,11 +9,13 @@ import {
 } from "../controller/auth.controller";
 import extractUser from "../middleware/extractUser.middleware";
 import { multerUpload } from "../middleware/uploadFile.middleware";
+import { validateBody } from "../middleware/validateResource";
 import Log from "../utils/logger";
+import { createUserValidators } from "../validators/user.validators";
 
 const authRouter = Router();
 
-authRouter.post("/signup", SignUpHandler);
+authRouter.post("/signup", validateBody(createUserValidators), SignUpHandler);
 authRouter.post("/login", loginController);
 
 authRouter.post("/verifyOtpForRegistration", varifyOtpHandlerForResgistration);

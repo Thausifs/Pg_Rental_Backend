@@ -13,32 +13,31 @@ import {
 import AppError from "../utils/AppError";
 import catchAsync from "../utils/catchAsync";
 import Log from "../utils/logger";
+import { createUserBodyType } from "../validators/user.validators";
 
 export const SignUpHandler = catchAsync(
   async (
-    req: Request<undefined, any, { number: string; name: string }>,
+    req: Request<undefined, any, createUserBodyType>,
     res: Response,
     next: NextFunction
   ) => {
     try {
       //*Check weather number is exist or not in database
-      const { number, name } = req.body;
-      const user = await User.findOne({ phoneNo: number });
+      const { phoneNo, name } = req.body;
+      const user = await User.findOne({ phoneNo });
       if (user) {
         return next(
           new AppError("Phone Number Alredy Exist", httpStatusCode.BAD_REQUEST)
         );
       }
-      const newUser = User.create({
-        phoneNo: number,
-        name,
-      });
+      const newUser = await User.create(req.body);
       const otp = otpGenerator();
       const encrytedOtp = await encryptTheOtp(otp);
       const newOtp = await otpModel.create({
         otp: encrytedOtp,
-        phoneNumber: number,
+        phoneNo: number,
       });
+      Log.info(otp);
       // await sendOtp(otp, number);
 
       res.status(201).json({
@@ -67,7 +66,7 @@ export const varifyOtpHandlerForResgistration = catchAsync(
   ) => {
     const { number, otp } = req.body;
     const getOtpModelInstance = await otpModel
-      .findOne({ phoneNumber: number })
+      .findOne({ phoneNo: number })
       .sort("-createdAt");
     Log.info(req.body);
 
@@ -89,7 +88,7 @@ export const varifyOtpHandlerForResgistration = catchAsync(
         }
       );
 
-      await otpModel.deleteMany({ phoneNumber: number });
+      await otpModel.deleteMany({ phoneNo: number });
       return res.status(200).json({
         status: true,
         error: "Otp is correct",
@@ -122,7 +121,7 @@ export const loginController = catchAsync(
     const encrytedOtp = await encryptTheOtp(otp);
     const newOtp = await otpModel.create({
       otp: encrytedOtp,
-      phoneNumber: number,
+      phoneNo: number,
     });
     Log.info(otp);
     // await sendOtp(otp, number);
@@ -140,7 +139,7 @@ export const varifyOtpHandlerForLogin = catchAsync(
   ) => {
     const { number, otp } = req.body;
     const getOtpModelInstance = await otpModel
-      .findOne({ phoneNumber: number })
+      .findOne({ phoneNo: number })
       .sort("-createdAt");
     Log.info(req.body);
 
@@ -152,9 +151,17 @@ export const varifyOtpHandlerForLogin = catchAsync(
       getOtpModelInstance.otp
     );
     if (correcnesOfOtp) {
-      const user = await User.findOne({ phoneNo: number });
+      const user = await User.findOne(
+        { phoneNo: number },
+        {
+          isActive: true,
+        },
+        {
+          new: true,
+        }
+      );
 
-      await otpModel.deleteMany({ phoneNumber: number });
+      await otpModel.deleteMany({ phoneNo: number });
       return res.status(200).json({
         status: true,
         error: "Otp is correct",

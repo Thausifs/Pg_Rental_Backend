@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 interface otpDocument extends mongoose.Document {
-  phoneNumber: string;
+  phoneNo: string;
   otp: string;
   isValid: boolean;
   createdAt: Date;
@@ -10,7 +10,7 @@ interface otpDocument extends mongoose.Document {
 
 const otpSchema = new mongoose.Schema<otpDocument>(
   {
-    phoneNumber: {
+    phoneNo: {
       type: String,
       require: true,
       length: 10,

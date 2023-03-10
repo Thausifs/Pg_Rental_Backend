@@ -1,20 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { AnyZodObject } from "zod";
-import Log from "../utils/logger";
-const validate =
+
+export const validateBody =
   (schema: AnyZodObject) =>
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      schema.parse({
-        body: req.body,
-        query: req.query,
-        params: req.params,
-      });
+      req.body = schema.parse(req.body);
+      next();
     } catch (error) {
-      Log.error(error);
-      return res.status(400).json({
-        status: false,
-      });
+      return next(error);
     }
   };
-export default validate;
