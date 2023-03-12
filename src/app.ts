@@ -1,5 +1,6 @@
 import express from "express";
 import config from "config";
+import cors from "cors";
 const app = express();
 import connect from "./utils/dbConnect";
 import Log from "./utils/logger";
@@ -18,6 +19,10 @@ app.use(express.urlencoded({ extended: true }));
  * Parse json request body
  */
 app.use(express.json({ strict: false }));
+/**
+ * Use Morgan For log
+ */
+app.use(cors());
 /**
  * Use Morgan For log
  */

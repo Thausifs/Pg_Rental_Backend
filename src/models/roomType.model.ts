@@ -6,3 +6,7 @@ const roomTypeSchema = new mongoose.Schema({
     require: true,
   },
 });
+
+const roomTypeModel = mongoose.model("roomType", roomTypeSchema);
+
+export default roomTypeModel;

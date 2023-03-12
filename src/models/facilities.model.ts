@@ -11,6 +11,6 @@ const facilities = new mongoose.Schema({
   },
 });
 
-const FacilitiesModel = mongoose.model("Feature", facilities);
+const FacilitiesModel = mongoose.model("feature", facilities);
 
 export default FacilitiesModel;

@@ -91,7 +91,7 @@ export const varifyOtpHandlerForResgistration = catchAsync(
       await otpModel.deleteMany({ phoneNo: number });
       return res.status(200).json({
         status: true,
-        error: "Otp is correct",
+        message: "Otp is correct",
         user,
         token: generateToken({
           userId: user?._id,
@@ -141,7 +141,6 @@ export const varifyOtpHandlerForLogin = catchAsync(
     const getOtpModelInstance = await otpModel
       .findOne({ phoneNo: number })
       .sort("-createdAt");
-    Log.info(req.body);
 
     if (!getOtpModelInstance) {
       return next(new AppError("Otp is incorrect", httpStatusCode.BAD_REQUEST));
@@ -151,7 +150,7 @@ export const varifyOtpHandlerForLogin = catchAsync(
       getOtpModelInstance.otp
     );
     if (correcnesOfOtp) {
-      const user = await User.findOne(
+      const user = await User.findOneAndUpdate(
         { phoneNo: number },
         {
           isActive: true,
@@ -164,7 +163,7 @@ export const varifyOtpHandlerForLogin = catchAsync(
       await otpModel.deleteMany({ phoneNo: number });
       return res.status(200).json({
         status: true,
-        error: "Otp is correct",
+        message: "Otp is correct",
         user,
         token: generateToken({
           userId: user?._id,
