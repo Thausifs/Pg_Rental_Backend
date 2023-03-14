@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
 const featureSchema = new mongoose.Schema({
-  name: {
+  feature_name: {
     type: String,
     require: true,
   },
-  iconImageUrl: {
+  icon: {
     type: String,
     require: true,
   },

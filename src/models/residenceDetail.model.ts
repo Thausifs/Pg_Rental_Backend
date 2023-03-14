@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { type } from "os";
 import { number } from "zod";
 
 const residentDetailSchema = new mongoose.Schema({
@@ -8,8 +7,8 @@ const residentDetailSchema = new mongoose.Schema({
     require: true,
   },
   city: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "city",
+    type: String,
+    require: true,
   },
   seoTitle: {
     type: String,
@@ -21,10 +20,9 @@ const residentDetailSchema = new mongoose.Schema({
   },
   occupanycies: [
     {
-      roomTYpeId: {
-        type: mongoose.Schema,
-        ref: "roomType",
-        require: true,
+      roomType: {
+        type: String,
+        required: true,
       },
       price: {
         type: number,
@@ -36,20 +34,29 @@ const residentDetailSchema = new mongoose.Schema({
       },
     },
   ],
-  address: {
-    line1: {
-      type: String,
+  feature: [
+    {
+      feature_name: {
+        type: String,
+      },
+      feature_icon: {
+        type: String,
+      },
     },
-  },
+  ],
   roomPhotos: [{ type: String, require: true }],
   dinningAreaPhotos: [{ type: String, require: true }],
   commonAreaPhotos: [{ type: String, require: true }],
-  facilitiesList: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "feature",
+  location: {
+    type: {
+      type: String,
+      default: "Point",
+      enum: ["Point"],
     },
-  ],
+    coordinates: [Number],
+    address: String,
+    description: String,
+  },
 });
 
 const ResidentDetailModel = mongoose.model("Feature", residentDetailSchema);

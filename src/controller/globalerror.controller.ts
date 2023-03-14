@@ -2,11 +2,12 @@
 import { Request, Response, NextFunction } from "express";
 import AppError from "../utils/AppError";
 import config from "config";
+import Log from "../utils/logger";
 
 const NODE_ENV = config.get<String>("NODE_ENV");
 
 const sentErrorDev = (err: AppError, res: Response) => {
-  // console.log(err.stack);
+  Log.error(err);
   res.status(err.statusCode).json({
     message: err.message,
     error: err,
