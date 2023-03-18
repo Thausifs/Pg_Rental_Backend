@@ -9,6 +9,7 @@ const citySchema = new mongoose.Schema({
   slug: {
     type: String,
     require: true,
+    unique: true,
   },
 });
 

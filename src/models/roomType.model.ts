@@ -9,8 +9,11 @@ const roomTypeSchema = new mongoose.Schema({
   slug: {
     type: String,
     require: true,
+    unique: true,
   },
 });
+
+roomTypeSchema.index({ slug: 1 }, { unique: true });
 
 const roomTypeModel = mongoose.model("roomType", roomTypeSchema);
 

@@ -7,6 +7,8 @@ import { addCityValidator } from "../validators/city.validator";
 
 const router = Router({ mergeParams: true });
 
+router.get("/", cityController.getAllCity);
+
 router.use(extractUser, restrictTo(["admin"]));
 
 router.post("/", validateBody(addCityValidator), cityController.addCity);

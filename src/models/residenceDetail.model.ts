@@ -25,7 +25,7 @@ const residentDetailSchema = new mongoose.Schema({
         required: true,
       },
       price: {
-        type: number,
+        type: Number,
         require: true,
       },
       numberOfOccupancies: {
@@ -36,24 +36,24 @@ const residentDetailSchema = new mongoose.Schema({
   ],
   feature: [
     {
-      feature_name: {
-        type: String,
-      },
-      feature_icon: {
-        type: String,
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "feature",
     },
   ],
   roomPhotos: [{ type: String, require: true }],
   dinningAreaPhotos: [{ type: String, require: true }],
   commonAreaPhotos: [{ type: String, require: true }],
+  googleMapUrl: {
+    type: String,
+    require: true,
+  },
   location: {
-    type: {
-      type: String,
-      default: "Point",
-      enum: ["Point"],
+    latitude: {
+      type: Number,
     },
-    coordinates: [Number],
+    longitude: {
+      type: Number,
+    },
     address: String,
     description: String,
   },

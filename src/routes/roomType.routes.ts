@@ -7,6 +7,8 @@ import { addCatagoryValidator } from "../validators/catagory.validator";
 
 const router = Router({ mergeParams: true });
 
+router.get("/", catagoryController.getAllCatagory);
+
 router.use(extractUser, restrictTo(["admin"]));
 
 router.post(

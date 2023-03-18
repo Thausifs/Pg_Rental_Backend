@@ -6,7 +6,9 @@ import connect from "./utils/dbConnect";
 import Log from "./utils/logger";
 import routes from "./routes";
 import mongan from "morgan";
-import globalErrorHandler from "./controller/globalerror.controller";
+import globalErrorHandler, {
+  fileUploadErrorHander,
+} from "./controller/globalerror.controller";
 
 const port = config.get<number>("port");
 
@@ -32,7 +34,10 @@ app.use(mongan("dev"));
  * Use All routes
  */
 routes(app);
-
+/**
+ * Handle All fileupload related error
+ */
+app.use(fileUploadErrorHander);
 /**
  * Global Error handler
  */

@@ -4,6 +4,12 @@ const facilities = new mongoose.Schema({
   name: {
     type: String,
     require: true,
+    unique: true,
+  },
+  slug: {
+    type: String,
+    require: true,
+    unique: true,
   },
   iconImageUrl: {
     type: String,
@@ -11,6 +17,6 @@ const facilities = new mongoose.Schema({
   },
 });
 
-const FacilitiesModel = mongoose.model("feature", facilities);
+const FacilitiesModel = mongoose.model("facilities", facilities);
 
 export default FacilitiesModel;

@@ -23,7 +23,6 @@ const userSchema = new mongoose.Schema<UserDocument>(
   {
     email: {
       type: String,
-      unique: true,
     },
     phoneNo: {
       type: String,

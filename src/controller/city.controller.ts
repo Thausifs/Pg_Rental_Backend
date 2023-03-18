@@ -20,7 +20,17 @@ const addCity = catchAsync(
     });
   }
 );
+const getAllCity = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const allCity = await City.find({});
+    res.status(200).json({
+      status: true,
+      data: allCity,
+    });
+  }
+);
 
 export default {
   addCity,
+  getAllCity,
 };

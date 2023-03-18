@@ -3,6 +3,7 @@ import User, { UserDocument } from "../models/user.model";
 import { decodeJwtToken } from "../service/jwt.service";
 import AppError from "../utils/AppError";
 import catchAsync from "../utils/catchAsync";
+import Log from "../utils/logger";
 
 declare global {
   namespace Express {

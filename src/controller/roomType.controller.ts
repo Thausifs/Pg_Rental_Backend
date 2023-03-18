@@ -20,7 +20,17 @@ const addCatagory = catchAsync(
     });
   }
 );
+const getAllCatagory = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const getAllRoomTypes = await roomTypeModel.find({});
+    res.status(200).json({
+      status: true,
+      data: getAllRoomTypes,
+    });
+  }
+);
 
 export default {
   addCatagory,
+  getAllCatagory,
 };

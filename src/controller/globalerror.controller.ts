@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import AppError from "../utils/AppError";
 import config from "config";
 import Log from "../utils/logger";
+import multer from "multer";
 
 const NODE_ENV = config.get<String>("NODE_ENV");
 
@@ -86,3 +87,16 @@ export default function globalErrorHandler(
 
   next();
 }
+
+export const fileUploadErrorHander = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
+    return next(new AppError("File too large", 400));
+  } else {
+    next(err);
+  }
+};
