@@ -6,7 +6,7 @@ export const validateBody =
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       req.body = await schema.parseAsync(req.body);
-      next();
+      return next();
     } catch (error) {
       next(error);
     }

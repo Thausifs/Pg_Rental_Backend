@@ -14,10 +14,29 @@ const residentDetailSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  feature: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "feature",
+    },
+  ],
+  location: {
+    latitude: {
+      type: String,
+    },
+    longitude: {
+      type: String,
+    },
+    state: String,
+    zip_code: String,
+    address: String,
+    description: String,
+  },
   description: {
     type: String,
     require: true,
   },
+  hotelSupportNumber: String,
   occupanycies: [
     {
       roomType: {
@@ -34,31 +53,17 @@ const residentDetailSchema = new mongoose.Schema({
       },
     },
   ],
-  feature: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "feature",
-    },
-  ],
+
   roomPhotos: [{ type: String, require: true }],
+  coverImage: [{ type: String, require: true }],
   dinningAreaPhotos: [{ type: String, require: true }],
   commonAreaPhotos: [{ type: String, require: true }],
   googleMapUrl: {
     type: String,
     require: true,
   },
-  location: {
-    latitude: {
-      type: Number,
-    },
-    longitude: {
-      type: Number,
-    },
-    address: String,
-    description: String,
-  },
 });
 
-const ResidentDetailModel = mongoose.model("Feature", residentDetailSchema);
+const ResidentDetailModel = mongoose.model("Resident", residentDetailSchema);
 
 export default ResidentDetailModel;

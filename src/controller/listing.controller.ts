@@ -32,7 +32,13 @@ const addNewListing = catchAsync(
         newListing.commonAreaPhotos.push(ele.path);
       });
     }
-    const newListingData = await (await newListing.save()).populate("feature");
+    const coverImages = files["coverImage"];
+    if (coverImages) {
+      coverImages.forEach((ele) => {
+        newListing.coverImage.push(ele.path);
+      });
+    }
+    const newListingData = await newListing.save();
 
     res.status(201).json({
       status: true,
@@ -40,7 +46,16 @@ const addNewListing = catchAsync(
     });
   }
 );
-
+const getAllListing = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const allListing = await ResidentDetailModel.find({});
+    res.status(200).json({
+      status: true,
+      data: allListing,
+    });
+  }
+);
 export default {
   addNewListing,
+  getAllListing,
 };

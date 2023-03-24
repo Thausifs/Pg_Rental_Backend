@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import FeatureModel from "../models/feature.model";
+import uploadImageToCloudnary from "../service/cloudnary.service";
+import AppError from "../utils/AppError";
 
 import catchAsync from "../utils/catchAsync";
+import { multerMemoryFiledType } from "../utils/Types/multer.memoryStorage";
 import { multerFiledType } from "../utils/Types/multer.types";
 
 const addFeature = catchAsync(
@@ -12,6 +15,9 @@ const addFeature = catchAsync(
   ) => {
     const files = req.files as multerFiledType;
     const featureImage = files["feature_image"];
+    if (!featureImage || featureImage?.length === 0) {
+      return next(new AppError("Feature logo is required", 400));
+    }
     const newFeature = await FeatureModel.create({
       feature_name: req.body.feature_name,
       icon: featureImage[0].path,

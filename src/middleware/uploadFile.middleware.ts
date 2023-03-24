@@ -33,15 +33,15 @@ export const multerUpload = function (): Multer {
   return multer({
     storage: configCloudnaryStorage,
     limits: {
-      fileSize: 30 * 1024 * 1024, // no larger than 30mb
+      fileSize: 200 * 1024 * 1024, // no larger than 200mb
     },
   });
 };
 export const imageUpload = function (): Multer {
   return multer({
-    storage: configCloudnaryStorage,
+    storage: multer.memoryStorage(),
     limits: {
-      fileSize: 30 * 1024 * 1024, // no larger than 30mb
+      fileSize: 200 * 1024 * 1024, // no larger than 200mb
     },
     fileFilter: imageFilter,
   });

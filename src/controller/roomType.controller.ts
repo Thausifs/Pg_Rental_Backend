@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 import roomTypeModel from "../models/roomType.model";
+import AppError from "../utils/AppError";
 import catchAsync from "../utils/catchAsync";
 
 const addCatagory = catchAsync(
@@ -10,6 +11,10 @@ const addCatagory = catchAsync(
     next: NextFunction
   ) => {
     const { name } = req.body;
+    const roomtype = await roomTypeModel.findOne({ typeOfRoom: name });
+    // if (roomtype) {
+    //   return next(new AppError("Room Type Already Exist", 400));
+    // }
     const newCatagory = await roomTypeModel.create({
       typeOfRoom: name,
       slug: name.toLowerCase().trim().split(" ").join("_"),

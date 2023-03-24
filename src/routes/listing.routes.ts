@@ -23,6 +23,7 @@ router.post(
     { name: "roomPhotos" },
     { name: "dinningAreaPhotos" },
     { name: "commonAreaPhotos" },
+    { name: "coverImage" },
   ]),
   validateBody(addListingValidator),
   listingController.addNewListing

@@ -13,8 +13,8 @@ const roomTypeSchema = new mongoose.Schema({
   },
 });
 
-roomTypeSchema.index({ slug: 1 }, { unique: true });
-
 const roomTypeModel = mongoose.model("roomType", roomTypeSchema);
+
+roomTypeModel.createIndexes({});
 
 export default roomTypeModel;
