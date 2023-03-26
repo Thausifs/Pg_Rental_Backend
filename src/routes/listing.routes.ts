@@ -1,19 +1,32 @@
 import { Router } from "express";
-import roomType from "./roomType.routes";
-import cityRouter from "./city.router";
-import featureRoutes from "./features.routes";
+
 import extractUser from "../middleware/extractUser.middleware";
 import restrictTo from "../middleware/restrictTo.middleware";
 import { multerUpload } from "../middleware/uploadFile.middleware";
-import { validateBody } from "../middleware/validateResource";
-import { addListingValidator } from "../validators/listing.validator";
+import { validateBody, validateQuery } from "../middleware/validateResource";
+import {
+  addListingValidator,
+  listingQueryValidator,
+} from "../validators/listing.validator";
 import listingController from "../controller/listing.controller";
+
+import roomType from "./roomType.routes";
+import cityRouter from "./city.router";
+import featureRoutes from "./features.routes";
+import availabilityRouter from "./availability.routes";
 
 const router = Router();
 
 router.use("/roomType", roomType);
 router.use("/city", cityRouter);
 router.use("/feature", featureRoutes);
+router.use("/availability", availabilityRouter);
+
+router.get(
+  "/",
+  validateQuery(listingQueryValidator),
+  listingController.getAllListing
+);
 
 router.use(extractUser, restrictTo(["admin"]));
 

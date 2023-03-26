@@ -1,17 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import User, { UserDocument } from "../models/user.model";
 import { decodeJwtToken } from "../service/jwt.service";
 import AppError from "../utils/AppError";
 import catchAsync from "../utils/catchAsync";
-import Log from "../utils/logger";
-
+import { PrismaClient, User } from "@prisma/client";
 declare global {
   namespace Express {
     interface Request {
-      user?: UserDocument;
+      user?: User;
     }
   }
 }
+const prisma = new PrismaClient();
 
 const extractUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -30,7 +29,11 @@ const extractUser = catchAsync(
       return next(new AppError("You Are Not into Login! Please login", 401));
     }
     const decode = (await decodeJwtToken(token)) as any;
-    const user = await User.findById(decode.userId);
+    const user = await prisma.user.findFirst({
+      where: {
+        phoneNo: decode.number,
+      },
+    });
     if (!user) {
       return next(new AppError("You Are Not into Login! Please login", 401));
     }

@@ -8,9 +8,7 @@ import {
   varifyOtpHandlerForResgistration,
 } from "../controller/auth.controller";
 import extractUser from "../middleware/extractUser.middleware";
-import { multerUpload } from "../middleware/uploadFile.middleware";
 import { validateBody } from "../middleware/validateResource";
-import Log from "../utils/logger";
 import { createUserValidators } from "../validators/user.validators";
 
 const authRouter = Router();

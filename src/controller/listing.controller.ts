@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import ResidentDetailModel from "../models/residenceDetail.model";
+import { PrismaClient } from "@prisma/client";
 
 import catchAsync from "../utils/catchAsync";
 import { multerFiledType } from "../utils/Types/multer.types";
-import { addListingType } from "../validators/listing.validator";
+import { addListingType, listingQuery } from "../validators/listing.validator";
+
+const prisma = new PrismaClient();
 
 const addNewListing = catchAsync(
   async (
@@ -13,44 +15,175 @@ const addNewListing = catchAsync(
   ) => {
     const files = req.files as multerFiledType;
 
-    const newListing = new ResidentDetailModel({ ...req.body });
+    const {
+      location,
+      city,
+      name,
+      seoTitle,
+      description,
+      hotelSupportNumber,
+      googleMapUrl,
+      feature,
+    } = req.body;
+
+    const newLocation = await prisma.location.create({
+      data: {
+        ...location,
+      },
+    });
+    const getCity = await prisma.city.findFirst({
+      where: {
+        slug: city,
+      },
+    });
+
+    const newListing = await prisma.resident.create({
+      data: {
+        name,
+        seoTitle,
+        description,
+        hotelSupportNumber,
+        googleMapUrl,
+        locationId: newLocation.id,
+        cityId: getCity?.id as string,
+      },
+    });
+    feature.forEach(async (ele) => {
+      await prisma.featureResident.create({
+        data: {
+          featureId: ele as string,
+          residentId: newListing.id,
+        },
+      });
+    });
+
     const roomPhotos = files["roomPhotos"];
     if (roomPhotos) {
-      roomPhotos.forEach((ele) => {
-        newListing.roomPhotos.push(ele.path);
+      roomPhotos.forEach(async (ele) => {
+        await prisma.residentRoomImage.create({
+          data: {
+            ...ele,
+            residentId: newListing.id,
+          },
+        });
       });
     }
     const dinningAreaPhotos = files["dinningAreaPhotos"];
     if (dinningAreaPhotos) {
-      dinningAreaPhotos.forEach((ele) => {
-        newListing.dinningAreaPhotos.push(ele.path);
+      dinningAreaPhotos.forEach(async (ele) => {
+        await prisma.residentDinningImage.create({
+          data: {
+            ...ele,
+            residentId: newListing.id,
+          },
+        });
       });
     }
     const commonAreaPhotos = files["commonAreaPhotos"];
     if (commonAreaPhotos) {
-      commonAreaPhotos.forEach((ele) => {
-        newListing.commonAreaPhotos.push(ele.path);
+      commonAreaPhotos.forEach(async (ele) => {
+        await prisma.residentCommonAreaImage.create({
+          data: {
+            ...ele,
+            residentId: newListing.id,
+          },
+        });
       });
     }
     const coverImages = files["coverImage"];
     if (coverImages) {
-      coverImages.forEach((ele) => {
-        newListing.coverImage.push(ele.path);
+      coverImages.forEach(async (ele) => {
+        await prisma.residentCoverImage.create({
+          data: {
+            ...ele,
+            residentId: newListing.id,
+          },
+        });
       });
     }
-    const newListingData = await newListing.save();
 
     res.status(201).json({
       status: true,
-      data: newListingData,
+      data: newListing,
     });
   }
 );
 const getAllListing = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const allListing = await ResidentDetailModel.find({});
+  async (
+    req: Request<any, any, any, listingQuery>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const { limit, page, city, typeOfRoom } = req.query;
+    const allListing = await prisma.resident.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      where: {
+        city: {
+          slug: {
+            contains: city,
+          },
+        },
+        AvailAbility: {
+          every: {
+            roomType: {
+              slug: {
+                contains: typeOfRoom,
+              },
+            },
+          },
+        },
+      },
+      include: {
+        FeatureResident: {
+          include: {
+            feature: true,
+          },
+        },
+        roomPhotos: {
+          select: {
+            id: true,
+            path: true,
+          },
+        },
+        coverImage: {
+          select: {
+            id: true,
+            path: true,
+          },
+        },
+        dinningAreaPhotos: {
+          select: {
+            id: true,
+            path: true,
+          },
+        },
+        commonAreaPhotos: {
+          select: {
+            id: true,
+            path: true,
+          },
+        },
+        AvailAbility: {
+          select: {
+            price: true,
+            numberOfOccupancies: true,
+            roomType: {
+              select: {
+                typeOfRoom: true,
+              },
+            },
+          },
+        },
+        location: true,
+        city: true,
+      },
+    });
     res.status(200).json({
       status: true,
+      length: allListing.length,
+      page,
+      limit,
       data: allListing,
     });
   }

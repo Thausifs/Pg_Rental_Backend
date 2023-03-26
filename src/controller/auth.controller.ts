@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from "express";
+import { PrismaClient } from "@prisma/client";
 import httpStatusCode from "http-status-codes";
-import { number } from "zod";
-import otpModel from "../models/otpModel";
-import User from "../models/user.model";
 import { generateToken } from "../service/jwt.service";
 import {
   checkOtpIsCorrectNess,
@@ -15,6 +13,8 @@ import catchAsync from "../utils/catchAsync";
 import Log from "../utils/logger";
 import { createUserBodyType } from "../validators/user.validators";
 
+const prisma = new PrismaClient();
+
 export const SignUpHandler = catchAsync(
   async (
     req: Request<undefined, any, createUserBodyType>,
@@ -24,21 +24,30 @@ export const SignUpHandler = catchAsync(
     try {
       //*Check weather number is exist or not in database
       const { phoneNo, name } = req.body;
-      const user = await User.findOne({ phoneNo });
+
+      const user = await prisma.user.findFirst({
+        where: {
+          phoneNo,
+        },
+      });
       if (user) {
         return next(
           new AppError("Phone Number Alredy Exist", httpStatusCode.BAD_REQUEST)
         );
       }
-      const newUser = await User.create(req.body);
+      const newUser = await prisma.user.create({ data: req.body });
       const otp = otpGenerator();
       const encrytedOtp = await encryptTheOtp(otp);
-      const newOtp = await otpModel.create({
-        otp: encrytedOtp,
-        phoneNo: number,
+
+      const newOtp = await prisma.otp.create({
+        data: {
+          otp: encrytedOtp,
+          userId: newUser.id,
+          isValid: true,
+        },
       });
+      // sendOtp(otp, phoneNo);
       Log.info(otp);
-      // await sendOtp(otp, number);
 
       res.status(201).json({
         status: true,
@@ -65,10 +74,20 @@ export const varifyOtpHandlerForResgistration = catchAsync(
     next: NextFunction
   ) => {
     const { number, otp } = req.body;
-    const getOtpModelInstance = await otpModel
-      .findOne({ phoneNo: number })
-      .sort("-createdAt");
-    Log.info(req.body);
+
+    const getOtpModelInstance = await prisma.otp.findFirst({
+      where: {
+        user: {
+          phoneNo: number,
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        user: true,
+      },
+    });
 
     if (!getOtpModelInstance) {
       return next(new AppError("Otp is incorrect", httpStatusCode.BAD_REQUEST));
@@ -78,23 +97,24 @@ export const varifyOtpHandlerForResgistration = catchAsync(
       getOtpModelInstance.otp
     );
     if (correcnesOfOtp) {
-      const user = await User.findOneAndUpdate(
-        { phoneNo: number },
-        {
-          isActive: true,
+      await prisma.otp.deleteMany({
+        where: {
+          user: {
+            phoneNo: number,
+          },
         },
-        {
-          new: true,
-        }
-      );
-
-      await otpModel.deleteMany({ phoneNo: number });
+      });
+      const user = await prisma.user.findFirst({
+        where: {
+          phoneNo: number,
+        },
+      });
       return res.status(200).json({
         status: true,
         message: "Otp is correct",
         user,
         token: generateToken({
-          userId: user?._id,
+          userId: user?.id as string,
           number,
         }),
       });
@@ -111,7 +131,11 @@ export const loginController = catchAsync(
     next: NextFunction
   ) => {
     const { number } = req.body;
-    const user = await User.findOne({ phoneNo: number });
+    const user = await prisma.user.findFirst({
+      where: {
+        phoneNo: number,
+      },
+    });
     if (!user) {
       return next(
         new AppError("User Does Not Exist", httpStatusCode.NOT_FOUND)
@@ -119,12 +143,16 @@ export const loginController = catchAsync(
     }
     const otp = otpGenerator();
     const encrytedOtp = await encryptTheOtp(otp);
-    const newOtp = await otpModel.create({
-      otp: encrytedOtp,
-      phoneNo: number,
+    sendOtp(otp, number);
+
+    await prisma.otp.create({
+      data: {
+        otp: encrytedOtp,
+        isValid: true,
+        userId: user.id,
+      },
     });
     Log.info(otp);
-    // await sendOtp(otp, number);
     res.status(httpStatusCode.OK).json({
       status: true,
       message: "Otp Send Successfully!",
@@ -138,9 +166,20 @@ export const varifyOtpHandlerForLogin = catchAsync(
     next: NextFunction
   ) => {
     const { number, otp } = req.body;
-    const getOtpModelInstance = await otpModel
-      .findOne({ phoneNo: number })
-      .sort("-createdAt");
+
+    const getOtpModelInstance = await prisma.otp.findFirst({
+      where: {
+        user: {
+          phoneNo: number,
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        user: true,
+      },
+    });
 
     if (!getOtpModelInstance) {
       return next(new AppError("Otp is incorrect", httpStatusCode.BAD_REQUEST));
@@ -150,23 +189,28 @@ export const varifyOtpHandlerForLogin = catchAsync(
       getOtpModelInstance.otp
     );
     if (correcnesOfOtp) {
-      const user = await User.findOneAndUpdate(
-        { phoneNo: number },
-        {
-          isActive: true,
+      await prisma.otp.deleteMany({
+        where: {
+          user: {
+            phoneNo: number,
+          },
         },
-        {
-          new: true,
-        }
-      );
+      });
+      const user = await prisma.user.findFirst({
+        where: {
+          phoneNo: number,
+        },
+      });
+      if (!user) {
+        return next(new AppError("User Does not Exisg", 400));
+      }
 
-      await otpModel.deleteMany({ phoneNo: number });
       return res.status(200).json({
         status: true,
         message: "Otp is correct",
         user,
         token: generateToken({
-          userId: user?._id,
+          userId: user.id,
           number,
         }),
       });
@@ -182,7 +226,7 @@ export const userDetailController = catchAsync(
       status: true,
       user: req?.user,
       token: generateToken({
-        userId: req.user?._id,
+        userId: req.user?.id as string,
         number: req.user?.phoneNo as string,
       }),
     });

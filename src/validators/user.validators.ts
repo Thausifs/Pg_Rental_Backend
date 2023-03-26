@@ -8,10 +8,8 @@ export const createUserValidators = z.object({
     .optional(),
   phoneNo: z.string(),
   address: z.string(),
-  idProof: z.object({
-    documentType: z.string(),
-    documentDetail: z.string(),
-  }),
+  document_type: z.string(),
+  document_detail: z.string(),
 });
 
 export type createUserBodyType = z.infer<typeof createUserValidators>;

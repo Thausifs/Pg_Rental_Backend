@@ -11,3 +11,14 @@ export const validateBody =
       next(error);
     }
   };
+export const validateQuery =
+  (schema: AnyZodObject) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      req.query = await schema.parseAsync(req.query);
+      return next();
+      2;
+    } catch (error) {
+      next(error);
+    }
+  };

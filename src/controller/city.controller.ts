@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import City from "../models/city.model";
+import { PrismaClient } from "@prisma/client";
 
 import catchAsync from "../utils/catchAsync";
+
+const prisma = new PrismaClient();
 
 const addCity = catchAsync(
   async (
@@ -10,9 +12,11 @@ const addCity = catchAsync(
     next: NextFunction
   ) => {
     const { name } = req.body;
-    const newCity = await City.create({
-      name: name,
-      slug: name.toLowerCase().trim().split(" ").join("_"),
+    const newCity = await prisma.city.create({
+      data: {
+        name: name,
+        slug: name.toLowerCase().trim().split(" ").join("_"),
+      },
     });
     res.status(201).json({
       status: true,
@@ -22,7 +26,7 @@ const addCity = catchAsync(
 );
 const getAllCity = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const allCity = await City.find({});
+    const allCity = await prisma.city.findMany();
     res.status(200).json({
       status: true,
       data: allCity,

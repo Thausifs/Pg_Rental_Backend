@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "prisma": "npx prisma generate"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "4.11.0",
     "@types/uuid": "^9.0.1",
     "add": "^2.0.6",
     "bcrypt": "^5.1.0",
@@ -28,6 +30,7 @@
     "multer-storage-cloudinary": "^4.0.0",
     "otp-generator": "^4.0.1",
     "pino": "^8.11.0",
+    "prisma": "^4.11.0",
     "sharp": "^0.31.3",
     "uuid": "^9.0.0",
     "zod": "^3.21.4"

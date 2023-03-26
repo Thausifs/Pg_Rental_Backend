@@ -39,7 +39,7 @@ export const multerUpload = function (): Multer {
 };
 export const imageUpload = function (): Multer {
   return multer({
-    storage: multer.memoryStorage(),
+    storage: configCloudnaryStorage,
     limits: {
       fileSize: 200 * 1024 * 1024, // no larger than 200mb
     },

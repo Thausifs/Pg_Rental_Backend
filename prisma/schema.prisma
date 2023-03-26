@@ -1,0 +1,193 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:Aritra@Superbase@1521@2767@db.bzdvbspwmmpbbgjmhsmo.supabase.co:5432/postgres"
+}
+
+model ProfileImage {
+  id           String @id @default(uuid())
+  fieldname    String
+  originalname String
+  encoding     String
+  mimetype     String
+  destination  String
+  filename     String
+  path         String
+  size         Int
+  User         User[]
+}
+
+model User {
+  id              String        @id @default(uuid())
+  email           String?
+  phoneNo         String
+  name            String
+  profile_pic     ProfileImage? @relation(fields: [profile_pic_id], references: [id], onDelete: Cascade)
+  profile_pic_id  String?       @unique
+  address         String
+  role            String        @default("user")
+  document_type   String
+  document_detail String
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  Otp       Otp[]
+}
+
+model Otp {
+  id        String   @id @default(uuid())
+  user      User?    @relation(fields: [userId], references: [id])
+  otp       String
+  isValid   Boolean
+  userId    String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+}
+
+model City {
+  id       String     @id @default(uuid())
+  name     String     @unique
+  slug     String     @unique
+  Resident Resident[]
+}
+
+model FeatureImage {
+  id           String   @id @default(uuid())
+  fieldname    String?
+  originalname String?
+  encoding     String?
+  mimetype     String?
+  destination  String?
+  filename     String?
+  path         String
+  size         Int?
+  Feature      Feature?
+}
+
+model Feature {
+  id               String            @id @default(uuid())
+  feature_name     String            @unique
+  slug             String            @unique
+  icon             FeatureImage      @relation(fields: [feature_image_id], references: [id], onDelete: Cascade)
+  feature_image_id String            @unique
+  FeatureResident  FeatureResident[]
+}
+
+model RoomType {
+  id           String         @id @default(uuid())
+  typeOfRoom   String         @unique
+  slug         String         @unique
+  AvailAbility AvailAbility[]
+}
+
+model ResidentRoomImage {
+  id           String    @id @default(uuid())
+  fieldname    String?
+  originalname String?
+  encoding     String?
+  mimetype     String?
+  destination  String?
+  filename     String?
+  path         String
+  size         Int?
+  Resident     Resident? @relation(fields: [residentId], references: [id], onDelete: Cascade)
+  residentId   String?
+}
+
+model ResidentCoverImage {
+  id           String    @id @default(uuid())
+  fieldname    String?
+  originalname String?
+  encoding     String?
+  mimetype     String?
+  destination  String?
+  filename     String?
+  path         String
+  size         Int?
+  Resident     Resident? @relation(fields: [residentId], references: [id], onDelete: Cascade)
+  residentId   String?
+}
+
+model ResidentDinningImage {
+  id           String    @id @default(uuid())
+  fieldname    String?
+  originalname String?
+  encoding     String?
+  mimetype     String?
+  destination  String?
+  filename     String?
+  path         String
+  size         Int?
+  Resident     Resident? @relation(fields: [residentId], references: [id], onDelete: Cascade)
+  residentId   String?
+}
+
+model ResidentCommonAreaImage {
+  id           String    @id @default(uuid())
+  fieldname    String?
+  originalname String?
+  encoding     String?
+  mimetype     String?
+  destination  String?
+  filename     String?
+  path         String
+  size         Int?
+  Resident     Resident? @relation(fields: [residentId], references: [id], onDelete: Cascade)
+  residentId   String?
+}
+
+model FeatureResident {
+  feature    Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  resident   Resident @relation(fields: [residentId], references: [id], onDelete: Cascade)
+  residentId String
+  featureId  String
+
+  @@id([residentId, featureId])
+}
+
+model Location {
+  id        String     @id @default(uuid())
+  latitude  String
+  longitude String
+  state     String
+  zip_code  String
+  address   String
+  Resident  Resident[]
+}
+
+model Resident {
+  id                 String                    @id @default(uuid())
+  name               String
+  city               City                      @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  seoTitle           String                    @unique
+  location           Location                  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  locationId         String                    @unique
+  FeatureResident    FeatureResident[]
+  description        String
+  hotelSupportNumber String
+  AvailAbility       AvailAbility[]
+  cityId             String
+  googleMapUrl       String
+  roomPhotos         ResidentRoomImage[]
+  coverImage         ResidentCoverImage[]
+  dinningAreaPhotos  ResidentDinningImage[]
+  commonAreaPhotos   ResidentCommonAreaImage[]
+}
+
+model AvailAbility {
+  roomType            RoomType @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+  resident            Resident @relation(fields: [residentId], references: [id], onDelete: Cascade)
+  price               Int
+  numberOfOccupancies Int
+
+  roomTypeId String
+  residentId String
+
+  @@id([residentId, roomTypeId])
+}
