@@ -143,7 +143,7 @@ export const loginController = catchAsync(
     }
     const otp = otpGenerator();
     const encrytedOtp = await encryptTheOtp(otp);
-    sendOtp(otp, number);
+    // sendOtp(otp, number);
 
     await prisma.otp.create({
       data: {
