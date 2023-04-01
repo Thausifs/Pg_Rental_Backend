@@ -28,6 +28,8 @@ router.get(
   listingController.getAllListing
 );
 
+router.get("/:id", listingController.getListingDetailById);
+
 router.use(extractUser, restrictTo(["admin"]));
 
 router.post(

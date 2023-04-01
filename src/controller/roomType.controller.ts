@@ -25,7 +25,6 @@ const addCatagory = catchAsync(
 );
 const getAllCatagory = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    // const getAllRoomTypes = await roomTypeModel.find({});
     const getAllRoomTypes = await prisma.roomType.findMany();
     res.status(200).json({
       status: true,

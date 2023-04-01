@@ -143,10 +143,11 @@ model ResidentCommonAreaImage {
 }
 
 model FeatureResident {
-  feature    Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
-  resident   Resident @relation(fields: [residentId], references: [id], onDelete: Cascade)
-  residentId String
-  featureId  String
+  feature         Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  resident        Resident @relation(fields: [residentId], references: [id], onDelete: Cascade)
+  fovarateFeature Boolean  @default(false)
+  residentId      String
+  featureId       String
 
   @@id([residentId, featureId])
 }

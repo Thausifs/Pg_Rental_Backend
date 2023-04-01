@@ -4,15 +4,12 @@ import { PrismaClient } from "@prisma/client";
 import catchAsync from "../utils/catchAsync";
 import { multerFiledType } from "../utils/Types/multer.types";
 import { addListingType, listingQuery } from "../validators/listing.validator";
+import AppError from "../utils/AppError";
 
 const prisma = new PrismaClient();
 
 const addNewListing = catchAsync(
-  async (
-    req: Request<any, any, addListingType>,
-    res: Response,
-    next: NextFunction
-  ) => {
+  async (req: Request<any, any, addListingType>, res: Response) => {
     const files = req.files as multerFiledType;
 
     const {
@@ -125,7 +122,7 @@ const getAllListing = catchAsync(
           },
         },
         AvailAbility: {
-          every: {
+          some: {
             roomType: {
               slug: {
                 contains: typeOfRoom,
@@ -175,6 +172,7 @@ const getAllListing = catchAsync(
             },
           },
         },
+
         location: true,
         city: true,
       },
@@ -188,7 +186,69 @@ const getAllListing = catchAsync(
     });
   }
 );
+const getListingDetailById = catchAsync(
+  async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+    const listingDetail = await prisma.resident.findFirst({
+      where: {
+        id: req.params.id,
+      },
+      include: {
+        FeatureResident: {
+          include: {
+            feature: true,
+          },
+        },
+        roomPhotos: {
+          select: {
+            id: true,
+            path: true,
+          },
+        },
+        coverImage: {
+          select: {
+            id: true,
+            path: true,
+          },
+        },
+        dinningAreaPhotos: {
+          select: {
+            id: true,
+            path: true,
+          },
+        },
+        commonAreaPhotos: {
+          select: {
+            id: true,
+            path: true,
+          },
+        },
+        AvailAbility: {
+          select: {
+            price: true,
+            numberOfOccupancies: true,
+            roomType: {
+              select: {
+                typeOfRoom: true,
+              },
+            },
+          },
+        },
+
+        location: true,
+        city: true,
+      },
+    });
+    if (!listingDetail) {
+      return next(new AppError("Listing Not found", 400));
+    }
+    res.status(200).json({
+      status: true,
+      data: listingDetail,
+    });
+  }
+);
 export default {
   addNewListing,
   getAllListing,
+  getListingDetailById,
 };
