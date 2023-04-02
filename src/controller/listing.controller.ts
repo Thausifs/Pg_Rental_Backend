@@ -186,6 +186,78 @@ const getAllListing = catchAsync(
     });
   }
 );
+const getAllListingAdmin = catchAsync(
+  async (
+    req: Request<any, any, any, listingQuery>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const { limit, page, city } = req.query;
+    const allListing = await prisma.resident.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      where: {
+        city: {
+          slug: {
+            contains: city,
+          },
+        },
+      },
+      include: {
+        FeatureResident: {
+          include: {
+            feature: true,
+          },
+        },
+        roomPhotos: {
+          select: {
+            id: true,
+            path: true,
+          },
+        },
+        coverImage: {
+          select: {
+            id: true,
+            path: true,
+          },
+        },
+        dinningAreaPhotos: {
+          select: {
+            id: true,
+            path: true,
+          },
+        },
+        commonAreaPhotos: {
+          select: {
+            id: true,
+            path: true,
+          },
+        },
+        AvailAbility: {
+          select: {
+            price: true,
+            numberOfOccupancies: true,
+            roomType: {
+              select: {
+                typeOfRoom: true,
+              },
+            },
+          },
+        },
+
+        location: true,
+        city: true,
+      },
+    });
+    res.status(200).json({
+      status: true,
+      length: allListing.length,
+      page,
+      limit,
+      data: allListing,
+    });
+  }
+);
 const getListingDetailById = catchAsync(
   async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
     const listingDetail = await prisma.resident.findFirst({
@@ -250,5 +322,6 @@ const getListingDetailById = catchAsync(
 export default {
   addNewListing,
   getAllListing,
+  getAllListingAdmin,
   getListingDetailById,
 };

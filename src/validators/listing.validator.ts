@@ -37,6 +37,22 @@ export const listingQueryValidator = z.object({
     .optional()
     .transform((val) => val?.toLocaleLowerCase()),
 });
+export const listingQueryValidatorAdmin = z.object({
+  page: z
+    .string()
+    .regex(/\d+/)
+    .transform((val) => parseInt(val))
+    .default("1"),
+  limit: z
+    .string()
+    .regex(/\d+/)
+    .transform((val) => parseInt(val))
+    .default("5"),
+  city: z
+    .string()
+    .optional()
+    .transform((val) => val?.toLocaleLowerCase()),
+});
 
 export type listingQuery = z.infer<typeof listingQueryValidator>;
 

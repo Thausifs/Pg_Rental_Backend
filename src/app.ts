@@ -2,7 +2,6 @@ import express from "express";
 import config from "config";
 import cors from "cors";
 const app = express();
-import connect from "./utils/dbConnect";
 import Log from "./utils/logger";
 import routes from "./routes";
 import mongan from "morgan";
@@ -45,5 +44,4 @@ app.use(globalErrorHandler);
 
 app.listen(port, async () => {
   Log.info(`App is running http://localhost:${port}`);
-  await connect();
 });

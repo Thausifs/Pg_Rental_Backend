@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:Aritra@Superbase@1521@2767@db.bzdvbspwmmpbbgjmhsmo.supabase.co:5432/postgres"
+  url      = "postgresql://amrita:password1234@164.90.233.23:5432/test"
 }
 
 model ProfileImage {
@@ -166,7 +166,7 @@ model Resident {
   id                 String                    @id @default(uuid())
   name               String
   city               City                      @relation(fields: [cityId], references: [id], onDelete: Cascade)
-  seoTitle           String                    @unique
+  seoTitle           String
   location           Location                  @relation(fields: [locationId], references: [id], onDelete: Cascade)
   locationId         String                    @unique
   FeatureResident    FeatureResident[]

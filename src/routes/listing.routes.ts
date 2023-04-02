@@ -7,6 +7,7 @@ import { validateBody, validateQuery } from "../middleware/validateResource";
 import {
   addListingValidator,
   listingQueryValidator,
+  listingQueryValidatorAdmin,
 } from "../validators/listing.validator";
 import listingController from "../controller/listing.controller";
 
@@ -42,6 +43,11 @@ router.post(
   ]),
   validateBody(addListingValidator),
   listingController.addNewListing
+);
+router.get(
+  "/admin/all",
+  validateQuery(listingQueryValidatorAdmin),
+  listingController.getAllListingAdmin
 );
 
 export default router;
