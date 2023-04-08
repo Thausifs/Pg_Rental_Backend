@@ -185,15 +185,16 @@ model Resident {
 enum ScheduleVisitState {
   scheduled
   completed
-  failed
+  canceled
 }
 
 model Schedule_Visit {
   uid             String             @id @default(uuid())
   resident        Resident           @relation(fields: [residentId], references: [id])
+  roomType        String             @default("Single Bed room")
   user_name       String
   phoneNo         String
-  date            String
+  date            DateTime           @db.Date
   time            String
   residentId      String
   completionState ScheduleVisitState @default(scheduled)

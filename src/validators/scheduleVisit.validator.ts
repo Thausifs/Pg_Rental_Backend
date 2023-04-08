@@ -6,6 +6,13 @@ export const newScheduleVisitValidator = z.object({
   date: z.string(),
   time: z.string(),
   residentId: z.string(),
+  roomType: z.string(),
+});
+export const updateScheduleVisitValidator = z.object({
+  completionState: z.enum(["scheduled", "completed", "canceled"]),
 });
 
 export type newScheduleVisitType = z.infer<typeof newScheduleVisitValidator>;
+export type updateScheduleVisitType = z.infer<
+  typeof updateScheduleVisitValidator
+>;
