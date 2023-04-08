@@ -179,9 +179,28 @@ model Resident {
   coverImage         ResidentCoverImage[]
   dinningAreaPhotos  ResidentDinningImage[]
   commonAreaPhotos   ResidentCommonAreaImage[]
+  Schedule_Visit     Schedule_Visit[]
+}
+
+enum ScheduleVisitState {
+  scheduled
+  completed
+  failed
+}
+
+model Schedule_Visit {
+  uid             String             @id @default(uuid())
+  resident        Resident           @relation(fields: [residentId], references: [id])
+  user_name       String
+  phoneNo         String
+  date            String
+  time            String
+  residentId      String
+  completionState ScheduleVisitState @default(scheduled)
 }
 
 model AvailAbility {
+  uid                 String   @default(uuid())
   roomType            RoomType @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
   resident            Resident @relation(fields: [residentId], references: [id], onDelete: Cascade)
   price               Int

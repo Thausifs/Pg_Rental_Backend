@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "ScheduleVisitState" AS ENUM ('scheduled', 'completed', 'failed');
+
 -- CreateTable
 CREATE TABLE "ProfileImage" (
     "id" TEXT NOT NULL,
@@ -19,7 +22,7 @@ CREATE TABLE "User" (
     "email" TEXT,
     "phoneNo" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "profile_pic_id" TEXT NOT NULL,
+    "profile_pic_id" TEXT,
     "address" TEXT NOT NULL,
     "role" TEXT NOT NULL DEFAULT 'user',
     "document_type" TEXT NOT NULL,
@@ -36,6 +39,8 @@ CREATE TABLE "Otp" (
     "otp" TEXT NOT NULL,
     "isValid" BOOLEAN NOT NULL,
     "userId" TEXT,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "Otp_pkey" PRIMARY KEY ("id")
 );
@@ -52,14 +57,14 @@ CREATE TABLE "City" (
 -- CreateTable
 CREATE TABLE "FeatureImage" (
     "id" TEXT NOT NULL,
-    "fieldname" TEXT NOT NULL,
-    "originalname" TEXT NOT NULL,
-    "encoding" TEXT NOT NULL,
-    "mimetype" TEXT NOT NULL,
-    "destination" TEXT NOT NULL,
-    "filename" TEXT NOT NULL,
+    "fieldname" TEXT,
+    "originalname" TEXT,
+    "encoding" TEXT,
+    "mimetype" TEXT,
+    "destination" TEXT,
+    "filename" TEXT,
     "path" TEXT NOT NULL,
-    "size" INTEGER NOT NULL,
+    "size" INTEGER,
 
     CONSTRAINT "FeatureImage_pkey" PRIMARY KEY ("id")
 );
@@ -86,14 +91,14 @@ CREATE TABLE "RoomType" (
 -- CreateTable
 CREATE TABLE "ResidentRoomImage" (
     "id" TEXT NOT NULL,
-    "fieldname" TEXT NOT NULL,
-    "originalname" TEXT NOT NULL,
-    "encoding" TEXT NOT NULL,
-    "mimetype" TEXT NOT NULL,
-    "destination" TEXT NOT NULL,
-    "filename" TEXT NOT NULL,
+    "fieldname" TEXT,
+    "originalname" TEXT,
+    "encoding" TEXT,
+    "mimetype" TEXT,
+    "destination" TEXT,
+    "filename" TEXT,
     "path" TEXT NOT NULL,
-    "size" INTEGER NOT NULL,
+    "size" INTEGER,
     "residentId" TEXT,
 
     CONSTRAINT "ResidentRoomImage_pkey" PRIMARY KEY ("id")
@@ -102,14 +107,14 @@ CREATE TABLE "ResidentRoomImage" (
 -- CreateTable
 CREATE TABLE "ResidentCoverImage" (
     "id" TEXT NOT NULL,
-    "fieldname" TEXT NOT NULL,
-    "originalname" TEXT NOT NULL,
-    "encoding" TEXT NOT NULL,
-    "mimetype" TEXT NOT NULL,
-    "destination" TEXT NOT NULL,
-    "filename" TEXT NOT NULL,
+    "fieldname" TEXT,
+    "originalname" TEXT,
+    "encoding" TEXT,
+    "mimetype" TEXT,
+    "destination" TEXT,
+    "filename" TEXT,
     "path" TEXT NOT NULL,
-    "size" INTEGER NOT NULL,
+    "size" INTEGER,
     "residentId" TEXT,
 
     CONSTRAINT "ResidentCoverImage_pkey" PRIMARY KEY ("id")
@@ -118,14 +123,14 @@ CREATE TABLE "ResidentCoverImage" (
 -- CreateTable
 CREATE TABLE "ResidentDinningImage" (
     "id" TEXT NOT NULL,
-    "fieldname" TEXT NOT NULL,
-    "originalname" TEXT NOT NULL,
-    "encoding" TEXT NOT NULL,
-    "mimetype" TEXT NOT NULL,
-    "destination" TEXT NOT NULL,
-    "filename" TEXT NOT NULL,
+    "fieldname" TEXT,
+    "originalname" TEXT,
+    "encoding" TEXT,
+    "mimetype" TEXT,
+    "destination" TEXT,
+    "filename" TEXT,
     "path" TEXT NOT NULL,
-    "size" INTEGER NOT NULL,
+    "size" INTEGER,
     "residentId" TEXT,
 
     CONSTRAINT "ResidentDinningImage_pkey" PRIMARY KEY ("id")
@@ -134,14 +139,14 @@ CREATE TABLE "ResidentDinningImage" (
 -- CreateTable
 CREATE TABLE "ResidentCommonAreaImage" (
     "id" TEXT NOT NULL,
-    "fieldname" TEXT NOT NULL,
-    "originalname" TEXT NOT NULL,
-    "encoding" TEXT NOT NULL,
-    "mimetype" TEXT NOT NULL,
-    "destination" TEXT NOT NULL,
-    "filename" TEXT NOT NULL,
+    "fieldname" TEXT,
+    "originalname" TEXT,
+    "encoding" TEXT,
+    "mimetype" TEXT,
+    "destination" TEXT,
+    "filename" TEXT,
     "path" TEXT NOT NULL,
-    "size" INTEGER NOT NULL,
+    "size" INTEGER,
     "residentId" TEXT,
 
     CONSTRAINT "ResidentCommonAreaImage_pkey" PRIMARY KEY ("id")
@@ -149,6 +154,7 @@ CREATE TABLE "ResidentCommonAreaImage" (
 
 -- CreateTable
 CREATE TABLE "FeatureResident" (
+    "fovarateFeature" BOOLEAN NOT NULL DEFAULT false,
     "residentId" TEXT NOT NULL,
     "featureId" TEXT NOT NULL,
 
@@ -163,7 +169,6 @@ CREATE TABLE "Location" (
     "state" TEXT NOT NULL,
     "zip_code" TEXT NOT NULL,
     "address" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
 
     CONSTRAINT "Location_pkey" PRIMARY KEY ("id")
 );
@@ -183,7 +188,21 @@ CREATE TABLE "Resident" (
 );
 
 -- CreateTable
+CREATE TABLE "Schedule_Visit" (
+    "uid" TEXT NOT NULL,
+    "user_name" TEXT NOT NULL,
+    "phoneNo" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "time" TEXT NOT NULL,
+    "residentId" TEXT NOT NULL,
+    "completionState" "ScheduleVisitState" NOT NULL DEFAULT 'scheduled',
+
+    CONSTRAINT "Schedule_Visit_pkey" PRIMARY KEY ("uid")
+);
+
+-- CreateTable
 CREATE TABLE "AvailAbility" (
+    "uid" TEXT NOT NULL,
     "price" INTEGER NOT NULL,
     "numberOfOccupancies" INTEGER NOT NULL,
     "roomTypeId" TEXT NOT NULL,
@@ -217,37 +236,34 @@ CREATE UNIQUE INDEX "RoomType_typeOfRoom_key" ON "RoomType"("typeOfRoom");
 CREATE UNIQUE INDEX "RoomType_slug_key" ON "RoomType"("slug");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Resident_seoTitle_key" ON "Resident"("seoTitle");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Resident_locationId_key" ON "Resident"("locationId");
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_profile_pic_id_fkey" FOREIGN KEY ("profile_pic_id") REFERENCES "ProfileImage"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_profile_pic_id_fkey" FOREIGN KEY ("profile_pic_id") REFERENCES "ProfileImage"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Otp" ADD CONSTRAINT "Otp_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Feature" ADD CONSTRAINT "Feature_feature_image_id_fkey" FOREIGN KEY ("feature_image_id") REFERENCES "FeatureImage"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Feature" ADD CONSTRAINT "Feature_feature_image_id_fkey" FOREIGN KEY ("feature_image_id") REFERENCES "FeatureImage"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ResidentRoomImage" ADD CONSTRAINT "ResidentRoomImage_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "ResidentRoomImage" ADD CONSTRAINT "ResidentRoomImage_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ResidentCoverImage" ADD CONSTRAINT "ResidentCoverImage_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "ResidentCoverImage" ADD CONSTRAINT "ResidentCoverImage_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ResidentDinningImage" ADD CONSTRAINT "ResidentDinningImage_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "ResidentDinningImage" ADD CONSTRAINT "ResidentDinningImage_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ResidentCommonAreaImage" ADD CONSTRAINT "ResidentCommonAreaImage_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "ResidentCommonAreaImage" ADD CONSTRAINT "ResidentCommonAreaImage_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "FeatureResident" ADD CONSTRAINT "FeatureResident_featureId_fkey" FOREIGN KEY ("featureId") REFERENCES "Feature"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "FeatureResident" ADD CONSTRAINT "FeatureResident_featureId_fkey" FOREIGN KEY ("featureId") REFERENCES "Feature"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "FeatureResident" ADD CONSTRAINT "FeatureResident_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "FeatureResident" ADD CONSTRAINT "FeatureResident_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Resident" ADD CONSTRAINT "Resident_cityId_fkey" FOREIGN KEY ("cityId") REFERENCES "City"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -256,7 +272,10 @@ ALTER TABLE "Resident" ADD CONSTRAINT "Resident_cityId_fkey" FOREIGN KEY ("cityI
 ALTER TABLE "Resident" ADD CONSTRAINT "Resident_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Location"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AvailAbility" ADD CONSTRAINT "AvailAbility_roomTypeId_fkey" FOREIGN KEY ("roomTypeId") REFERENCES "RoomType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Schedule_Visit" ADD CONSTRAINT "Schedule_Visit_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AvailAbility" ADD CONSTRAINT "AvailAbility_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "AvailAbility" ADD CONSTRAINT "AvailAbility_roomTypeId_fkey" FOREIGN KEY ("roomTypeId") REFERENCES "RoomType"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AvailAbility" ADD CONSTRAINT "AvailAbility_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE CASCADE ON UPDATE CASCADE;

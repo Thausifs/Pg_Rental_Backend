@@ -14,6 +14,7 @@ import listingController from "../controller/listing.controller";
 import roomType from "./roomType.routes";
 import cityRouter from "./city.router";
 import featureRoutes from "./features.routes";
+import scheduleVisitRoutes from "./scheduleVisit.routes";
 import availabilityRouter from "./availability.routes";
 
 const router = Router();
@@ -22,6 +23,7 @@ router.use("/roomType", roomType);
 router.use("/city", cityRouter);
 router.use("/feature", featureRoutes);
 router.use("/availability", availabilityRouter);
+router.use("/scheduleVisit", scheduleVisitRoutes);
 
 router.get(
   "/",
