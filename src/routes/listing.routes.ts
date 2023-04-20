@@ -16,6 +16,10 @@ import cityRouter from "./city.router";
 import featureRoutes from "./features.routes";
 import scheduleVisitRoutes from "./scheduleVisit.routes";
 import availabilityRouter from "./availability.routes";
+import advanceBookingRouter from "./advanceBooking.routes";
+import commentRouter from "./comment.router";
+import rentPaymenRouter from "./rentPayment.routes";
+import compainRouter from "./complain.routes";
 
 const router = Router();
 
@@ -24,6 +28,10 @@ router.use("/city", cityRouter);
 router.use("/feature", featureRoutes);
 router.use("/availability", availabilityRouter);
 router.use("/scheduleVisit", scheduleVisitRoutes);
+router.use("/advanceBooking", advanceBookingRouter);
+router.use("/:listingId/comment", commentRouter);
+router.use("/rentPayment", rentPaymenRouter);
+router.use("/complain", compainRouter);
 
 router.get(
   "/",

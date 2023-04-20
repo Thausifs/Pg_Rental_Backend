@@ -163,12 +163,19 @@ const getAllListing = catchAsync(
         },
         AvailAbility: {
           select: {
+            uid: true,
             price: true,
             numberOfOccupancies: true,
+            planIdRazorpay: true,
             roomType: {
               select: {
                 typeOfRoom: true,
               },
+            },
+          },
+          where: {
+            roomType: {
+              slug: typeOfRoom,
             },
           },
         },
@@ -235,6 +242,7 @@ const getAllListingAdmin = catchAsync(
         },
         AvailAbility: {
           select: {
+            uid: true,
             price: true,
             numberOfOccupancies: true,
             roomType: {
@@ -296,7 +304,9 @@ const getListingDetailById = catchAsync(
         },
         AvailAbility: {
           select: {
+            uid: true,
             price: true,
+            planIdRazorpay: true,
             numberOfOccupancies: true,
             roomType: {
               select: {

@@ -6,4 +6,6 @@ export default {
   jwt_secret: "MyVerySecret@",
   jwt_expires_in: "1d",
   number_of_salt: 10,
+  RAZORPAY_KEY_ID: "rzp_test_ftb5flv3icVffB",
+  RAZOR_PAY_KEY_SECRET: "9CIn2hbt4BD0c8OiR1LCNnKS",
 };

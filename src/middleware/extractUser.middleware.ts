@@ -22,7 +22,6 @@ const extractUser = catchAsync(
       req.headers.authorization.startsWith("Bearer")
     ) {
       token = req.headers.authorization.split(" ")[1];
-      // console.log(token);
     }
     //*If Token is not exist
     if (!token) {

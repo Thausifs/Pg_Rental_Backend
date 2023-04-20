@@ -35,9 +35,12 @@ model User {
   document_type   String
   document_detail String
 
-  createdAt DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt DateTime @updatedAt @db.Timestamptz(3)
-  Otp       Otp[]
+  createdAt             DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime                @updatedAt @db.Timestamptz(3)
+  Otp                   Otp[]
+  Comment               Comment[]
+  RentPaymentSubcriptin RentPaymentSubcriptin[]
+  Complain              Complain[]
 }
 
 model Otp {
@@ -80,10 +83,11 @@ model Feature {
 }
 
 model RoomType {
-  id           String         @id @default(uuid())
-  typeOfRoom   String         @unique
-  slug         String         @unique
-  AvailAbility AvailAbility[]
+  id             String           @id @default(uuid())
+  typeOfRoom     String           @unique
+  slug           String           @unique
+  AvailAbility   AvailAbility[]
+  AdvanceBooking AdvanceBooking[]
 }
 
 model ResidentRoomImage {
@@ -180,6 +184,8 @@ model Resident {
   dinningAreaPhotos  ResidentDinningImage[]
   commonAreaPhotos   ResidentCommonAreaImage[]
   Schedule_Visit     Schedule_Visit[]
+  AdvanceBooking     AdvanceBooking[]
+  Comment            Comment[]
 }
 
 enum ScheduleVisitState {
@@ -198,17 +204,86 @@ model Schedule_Visit {
   time            String
   residentId      String
   completionState ScheduleVisitState @default(scheduled)
+  createdAt       DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime           @updatedAt @db.Timestamptz(3)
+}
+
+model AdvanceBooking {
+  uid                 String   @id @default(uuid())
+  resident            Resident @relation(fields: [residentId], references: [id])
+  roomType            RoomType @relation(fields: [roomTypeName], references: [typeOfRoom], onDelete: Cascade)
+  roomTypeName        String
+  user_name           String
+  phoneNo             String   @unique
+  date                DateTime @db.Date
+  razorpayOrderId     String   @unique
+  residentId          String
+  razorpay_payment_id String?
+  createdAt           DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime @updatedAt @db.Timestamptz(3)
+
+  isPaymentSuccess Boolean @default(false)
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  content    String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resident   Resident @relation(fields: [residentId], references: [id], onDelete: Cascade)
+  userId     String
+  residentId String
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  @@unique([residentId, userId])
 }
 
 model AvailAbility {
-  uid                 String   @default(uuid())
-  roomType            RoomType @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
-  resident            Resident @relation(fields: [residentId], references: [id], onDelete: Cascade)
-  price               Int
-  numberOfOccupancies Int
-
-  roomTypeId String
-  residentId String
+  uid                   String                  @unique @default(uuid())
+  roomType              RoomType                @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+  resident              Resident                @relation(fields: [residentId], references: [id], onDelete: Cascade)
+  price                 Int
+  numberOfOccupancies   Int
+  planIdRazorpay        String?
+  roomTypeId            String
+  residentId            String
+  RentPaymentSubcriptin RentPaymentSubcriptin[]
 
   @@id([residentId, roomTypeId])
+}
+
+enum RentPaymentStatus {
+  CREATED
+  ACTIVE
+  CANCEL
+}
+
+model RentPaymentSubcriptin {
+  uid               String            @id @default(uuid())
+  status            RentPaymentStatus @default(CREATED)
+  user              User              @relation(fields: [userId], references: [id])
+  availability      AvailAbility      @relation(fields: [availabilityId], references: [uid])
+  userId            String
+  availabilityId    String
+  planId            String
+  subcriptionId     String            @unique
+  cancelComment     String?
+  razorpayPaymentId String?
+  createdAt         DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime          @updatedAt @db.Timestamptz(3)
+}
+
+enum ComplainState {
+  RESOLVED
+  CREATED
+}
+
+model Complain {
+  id        String        @id @default(uuid())
+  message   String
+  user      User          @relation(fields: [userId], references: [id])
+  userId    String
+  state     ComplainState @default(CREATED)
+  createdAt DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime      @updatedAt @db.Timestamptz(3)
 }

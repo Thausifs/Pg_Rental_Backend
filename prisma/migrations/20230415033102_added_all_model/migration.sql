@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "ScheduleVisitState" AS ENUM ('scheduled', 'completed', 'failed');
+CREATE TYPE "ScheduleVisitState" AS ENUM ('scheduled', 'completed', 'canceled');
 
 -- CreateTable
 CREATE TABLE "ProfileImage" (
@@ -190,14 +190,42 @@ CREATE TABLE "Resident" (
 -- CreateTable
 CREATE TABLE "Schedule_Visit" (
     "uid" TEXT NOT NULL,
+    "roomType" TEXT NOT NULL DEFAULT 'Single Bed room',
     "user_name" TEXT NOT NULL,
     "phoneNo" TEXT NOT NULL,
-    "date" TEXT NOT NULL,
+    "date" DATE NOT NULL,
     "time" TEXT NOT NULL,
     "residentId" TEXT NOT NULL,
     "completionState" "ScheduleVisitState" NOT NULL DEFAULT 'scheduled',
 
     CONSTRAINT "Schedule_Visit_pkey" PRIMARY KEY ("uid")
+);
+
+-- CreateTable
+CREATE TABLE "AdvanceBooking" (
+    "uid" TEXT NOT NULL,
+    "roomTypeName" TEXT NOT NULL,
+    "user_name" TEXT NOT NULL,
+    "phoneNo" TEXT NOT NULL,
+    "date" DATE NOT NULL,
+    "razorpayOrderId" TEXT NOT NULL,
+    "residentId" TEXT NOT NULL,
+    "razorpay_payment_id" TEXT,
+    "isPaymentSuccess" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "AdvanceBooking_pkey" PRIMARY KEY ("uid")
+);
+
+-- CreateTable
+CREATE TABLE "Comment" (
+    "id" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "residentId" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
+
+    CONSTRAINT "Comment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -238,6 +266,12 @@ CREATE UNIQUE INDEX "RoomType_slug_key" ON "RoomType"("slug");
 -- CreateIndex
 CREATE UNIQUE INDEX "Resident_locationId_key" ON "Resident"("locationId");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "AdvanceBooking_phoneNo_key" ON "AdvanceBooking"("phoneNo");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AdvanceBooking_razorpayOrderId_key" ON "AdvanceBooking"("razorpayOrderId");
+
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_profile_pic_id_fkey" FOREIGN KEY ("profile_pic_id") REFERENCES "ProfileImage"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -273,6 +307,18 @@ ALTER TABLE "Resident" ADD CONSTRAINT "Resident_locationId_fkey" FOREIGN KEY ("l
 
 -- AddForeignKey
 ALTER TABLE "Schedule_Visit" ADD CONSTRAINT "Schedule_Visit_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AdvanceBooking" ADD CONSTRAINT "AdvanceBooking_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AdvanceBooking" ADD CONSTRAINT "AdvanceBooking_roomTypeName_fkey" FOREIGN KEY ("roomTypeName") REFERENCES "RoomType"("typeOfRoom") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Comment" ADD CONSTRAINT "Comment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Comment" ADD CONSTRAINT "Comment_residentId_fkey" FOREIGN KEY ("residentId") REFERENCES "Resident"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AvailAbility" ADD CONSTRAINT "AvailAbility_roomTypeId_fkey" FOREIGN KEY ("roomTypeId") REFERENCES "RoomType"("id") ON DELETE CASCADE ON UPDATE CASCADE;

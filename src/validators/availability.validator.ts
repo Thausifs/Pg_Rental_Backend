@@ -10,3 +10,10 @@ export const addNewAvailabilityValidator = z.object({
 export type addNewAvailabilityType = z.infer<
   typeof addNewAvailabilityValidator
 >;
+
+export const editAvailabilityValidator = z.object({
+  price: z.number(),
+  numberOfOccupancies: z.number(),
+});
+
+export type editAvailabilityType = z.infer<typeof addNewAvailabilityValidator>;
