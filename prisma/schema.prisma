@@ -11,15 +11,15 @@ datasource db {
 }
 
 model ProfileImage {
-  id           String @id @default(uuid())
-  fieldname    String
-  originalname String
-  encoding     String
-  mimetype     String
-  destination  String
-  filename     String
+  id           String  @id @default(uuid())
+  fieldname    String?
+  originalname String?
+  encoding     String?
+  mimetype     String?
+  destination  String?
+  filename     String?
   path         String
-  size         Int
+  size         Int?
   User         User[]
 }
 
@@ -286,4 +286,28 @@ model Complain {
   state     ComplainState @default(CREATED)
   createdAt DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt DateTime      @updatedAt @db.Timestamptz(3)
+}
+
+model TeamMemberImage {
+  id           String  @id @default(uuid())
+  fieldname    String?
+  originalname String?
+  encoding     String?
+  mimetype     String?
+  destination  String?
+  filename     String?
+  path         String
+  size         Int?
+  TeamMember TeamMember[]
+}
+
+model TeamMember {
+  id                String          @id @default(uuid())
+  name              String
+  title             String
+  facebookUrl       String?
+  linkedinUrl       String?
+  twitterUrl        String?
+  pic               TeamMemberImage @relation(fields: [teamMemberImageId], references: [id])
+  teamMemberImageId String
 }
