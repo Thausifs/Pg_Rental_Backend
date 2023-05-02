@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://test:test@123@104.248.245.30:5432/test"
+  url      = env("DATABASE_URL")
 }
 
 model ProfileImage {
