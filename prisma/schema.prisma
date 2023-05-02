@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://amrita:password1234@164.90.233.23:5432/test"
+  url      = "postgresql://test:test@123@104.248.245.30:5432/test"
 }
 
 model ProfileImage {
@@ -278,6 +278,12 @@ enum ComplainState {
   CREATED
 }
 
+enum ComplainCatagory {
+  ELECTRICAL
+  PLUMBING
+  SNITARY
+}
+
 model Complain {
   id        String        @id @default(uuid())
   message   String
@@ -286,10 +292,11 @@ model Complain {
   state     ComplainState @default(CREATED)
   createdAt DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt DateTime      @updatedAt @db.Timestamptz(3)
+  ComplainCatagory ComplainCatagory 
 }
 
 model TeamMemberImage {
-  id           String  @id @default(uuid())
+  id           String       @id @default(uuid())
   fieldname    String?
   originalname String?
   encoding     String?
@@ -298,7 +305,7 @@ model TeamMemberImage {
   filename     String?
   path         String
   size         Int?
-  TeamMember TeamMember[]
+  TeamMember   TeamMember[]
 }
 
 model TeamMember {

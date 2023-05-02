@@ -5,6 +5,7 @@ import catchAsync from "../utils/catchAsync";
 import { multerFiledType } from "../utils/Types/multer.types";
 import { addListingType, listingQuery } from "../validators/listing.validator";
 import AppError from "../utils/AppError";
+import { P } from "pino";
 
 const prisma = new PrismaClient();
 
@@ -329,9 +330,41 @@ const getListingDetailById = catchAsync(
     });
   }
 );
+
+const getAnaliticData = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const numberOfScheduleVisit = await prisma.schedule_Visit.aggregate({
+      _count: {
+        uid: true,
+      },
+      where: {
+        completionState: "scheduled",
+      },
+    });
+    const numberOfReview = await prisma.comment.aggregate({
+      _count: {
+        id: true,
+      },
+    });
+    const numberOfAdvanceBooking = await prisma.advanceBooking.aggregate({
+      _count: {
+        uid: true,
+      },
+      where: {
+        isPaymentSuccess: true,
+      },
+    });
+    res.status(200).json({
+      numberOfScheduleVisit: numberOfScheduleVisit._count.uid,
+      numberOfComment: numberOfReview._count.id,
+      numberOfAdvanceBooking: numberOfAdvanceBooking._count.uid,
+    });
+  }
+);
 export default {
   addNewListing,
   getAllListing,
   getAllListingAdmin,
   getListingDetailById,
+  getAnaliticData,
 };

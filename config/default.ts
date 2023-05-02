@@ -1,6 +1,6 @@
 export default {
   port: 1337,
-  NODE_ENV: "devolopment",
+  NODE_ENV: "production",
   dbUri:
     "mongodb+srv://aritra1521:f49rhP00NvDzu2DI@pg-rental.r4zyplj.mongodb.net/?retryWrites=true&w=majority",
   jwt_secret: "MyVerySecret@",

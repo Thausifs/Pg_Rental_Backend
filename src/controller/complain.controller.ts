@@ -19,6 +19,7 @@ const addNewComplain = catchAsync(
       data: {
         message: req.body.message,
         userId: req.user?.id as string,
+        ComplainCatagory: req.body.ComplainCatagory,
       },
     });
 

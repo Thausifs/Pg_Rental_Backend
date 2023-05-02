@@ -33,6 +33,8 @@ router.use("/:listingId/comment", commentRouter);
 router.use("/rentPayment", rentPaymenRouter);
 router.use("/complain", compainRouter);
 
+router.use("/analitic", listingController.getAnaliticData);
+
 router.get(
   "/",
   validateQuery(listingQueryValidator),
