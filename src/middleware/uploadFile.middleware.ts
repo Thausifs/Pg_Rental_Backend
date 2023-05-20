@@ -6,11 +6,16 @@ import { v4 } from "uuid";
 import catchAsync from "../utils/catchAsync";
 import { NextFunction, Request, Response } from "express";
 import AppError from "../utils/AppError";
+import config from 'config'
+
+const CLOUDNARY_CLOUD_NAME=config.get<string>("CLOUDNARY_CLOUD_NAME")
+const CLOUDNARY_API_KEY=config.get<string>("CLOUDNARY_API_KEY")
+const CLOUDNARY_API_SECRET=config.get<string>("CLOUDNARY_API_SECRET")
 
 cloudnary.v2.config({
-  cloud_name: "drbwctym7",
-  api_key: "432239942823659",
-  api_secret: "zMlrJDjoARHHzNj9J4JwugDmVic",
+  cloud_name:CLOUDNARY_CLOUD_NAME,
+  api_key: CLOUDNARY_API_KEY,
+  api_secret: CLOUDNARY_API_SECRET,
 });
 const configCloudnaryStorage = new CloudinaryStorage({
   cloudinary: cloudnary.v2,

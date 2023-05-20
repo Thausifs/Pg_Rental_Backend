@@ -33,8 +33,23 @@ const getAllCity = catchAsync(
     });
   }
 );
+const deleteCityById = catchAsync(
+  async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+    const city = await prisma.city.findFirst({ where: { id: req.params.id } });
+    if (!city) {
+      res.status(400).json({
+        message: "City Doesnot exist",
+      });
+    }
+    await prisma.city.deleteMany({
+      where: { id: req.params.id,},
+    });
+    res.sendStatus(200);
+  }
+);
 
 export default {
   addCity,
   getAllCity,
+  deleteCityById,
 };

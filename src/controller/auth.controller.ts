@@ -46,7 +46,7 @@ export const SignUpHandler = catchAsync(
           isValid: true,
         },
       });
-      // sendOtp(otp, phoneNo);
+      sendOtp(otp, phoneNo);
       Log.info(otp);
 
       res.status(201).json({
@@ -143,7 +143,7 @@ export const loginController = catchAsync(
     }
     const otp = otpGenerator();
     const encrytedOtp = await encryptTheOtp(otp);
-    // sendOtp(otp, number);
+    sendOtp(otp, number);
 
     await prisma.otp.create({
       data: {

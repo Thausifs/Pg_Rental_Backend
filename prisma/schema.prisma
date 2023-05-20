@@ -45,7 +45,7 @@ model User {
 
 model Otp {
   id        String   @id @default(uuid())
-  user      User?    @relation(fields: [userId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   otp       String
   isValid   Boolean
   userId    String?
@@ -196,7 +196,7 @@ enum ScheduleVisitState {
 
 model Schedule_Visit {
   uid             String             @id @default(uuid())
-  resident        Resident           @relation(fields: [residentId], references: [id])
+  resident        Resident           @relation(fields: [residentId], references: [id], onDelete: Cascade)
   roomType        String             @default("Single Bed room")
   user_name       String
   phoneNo         String
@@ -210,7 +210,7 @@ model Schedule_Visit {
 
 model AdvanceBooking {
   uid                 String   @id @default(uuid())
-  resident            Resident @relation(fields: [residentId], references: [id])
+  resident            Resident @relation(fields: [residentId], references: [id], onDelete: Cascade)
   roomType            RoomType @relation(fields: [roomTypeName], references: [typeOfRoom], onDelete: Cascade)
   roomTypeName        String
   user_name           String
@@ -261,8 +261,8 @@ enum RentPaymentStatus {
 model RentPaymentSubcriptin {
   uid               String            @id @default(uuid())
   status            RentPaymentStatus @default(CREATED)
-  user              User              @relation(fields: [userId], references: [id])
-  availability      AvailAbility      @relation(fields: [availabilityId], references: [uid])
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  availability      AvailAbility      @relation(fields: [availabilityId], references: [uid], onDelete: Cascade)
   userId            String
   availabilityId    String
   planId            String
@@ -285,14 +285,14 @@ enum ComplainCatagory {
 }
 
 model Complain {
-  id        String        @id @default(uuid())
-  message   String
-  user      User          @relation(fields: [userId], references: [id])
-  userId    String
-  state     ComplainState @default(CREATED)
-  createdAt DateTime      @default(now()) @db.Timestamptz(3)
-  updatedAt DateTime      @updatedAt @db.Timestamptz(3)
-  ComplainCatagory ComplainCatagory 
+  id               String           @id @default(uuid())
+  message          String
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           String
+  state            ComplainState    @default(CREATED)
+  createdAt        DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime         @updatedAt @db.Timestamptz(3)
+  ComplainCatagory ComplainCatagory
 }
 
 model TeamMemberImage {
@@ -315,6 +315,6 @@ model TeamMember {
   facebookUrl       String?
   linkedinUrl       String?
   twitterUrl        String?
-  pic               TeamMemberImage @relation(fields: [teamMemberImageId], references: [id])
+  pic               TeamMemberImage @relation(fields: [teamMemberImageId], references: [id], onDelete: Cascade)
   teamMemberImageId String
 }

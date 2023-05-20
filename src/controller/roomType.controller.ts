@@ -32,8 +32,26 @@ const getAllCatagory = catchAsync(
     });
   }
 );
+const deleteRoomTypeById = catchAsync(
+  async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+    const roomType = await prisma.roomType.findFirst({
+      where: { id: req.params.id },
+    });
+    if (!roomType) {
+      res.status(400).json({
+        message: "roomType Doesnot exist",
+      });
+    }
+    
+    await prisma.roomType.delete({
+      where: { slug: roomType?.slug },
+    });
+    res.sendStatus(200);
+  }
+);
 
 export default {
   addCatagory,
   getAllCatagory,
+  deleteRoomTypeById,
 };

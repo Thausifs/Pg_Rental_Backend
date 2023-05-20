@@ -8,6 +8,7 @@ import {
   editUserBodyType,
 } from "../validators/user.validators";
 import AppError from "../utils/AppError";
+import { sendMessage } from "../service/otp.service";
 
 const prisma = new PrismaClient();
 
@@ -29,6 +30,11 @@ const createUser = catchAsync(
       );
     }
     const newUser = await prisma.user.create({ data: req.body });
+    sendMessage(
+      `${newUser.name} Account Created Successfully`,
+      newUser.phoneNo
+    );
+
     res.status(201).json({
       status: true,
       data: newUser,

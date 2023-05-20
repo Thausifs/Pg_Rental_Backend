@@ -11,6 +11,7 @@ router.get("/", cityController.getAllCity);
 
 router.use(extractUser, restrictTo(["admin"]));
 
+router.delete("/:id", cityController.deleteCityById);
 router.post("/", validateBody(addCityValidator), cityController.addCity);
 
 export default router;

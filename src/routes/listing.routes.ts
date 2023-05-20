@@ -45,6 +45,8 @@ router.get("/:id", listingController.getListingDetailById);
 
 router.use(extractUser, restrictTo(["admin"]));
 
+router.delete("/:id",listingController.deleteListingById)
+
 router.post(
   "/",
   multerUpload().fields([

@@ -12,6 +12,8 @@ router.get("/", featureController.getAllFeature);
 
 router.use(extractUser, restrictTo(["admin"]));
 
+router.delete("/:id",featureController.deleteFeatureById)
+
 router.post(
   "/",
   imageUpload().fields([{ name: "feature_image", maxCount: 1 }]),

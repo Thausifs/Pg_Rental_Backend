@@ -2,6 +2,7 @@ import { generate } from "otp-generator";
 import bcrypt from "bcrypt";
 import config from "config";
 
+const nodeEnv = config.get<string>("NODE_ENV");
 const numberOfSalt = config.get<number>("number_of_salt");
 
 export const otpGenerator = () => {
@@ -25,6 +26,35 @@ export const sendOtp = async (otp: string, number: string) => {
         route: "v3",
         sender_id: "FTWSMS",
         message: `Your Otp is ${otp}`,
+        language: "english",
+        flash: 0,
+        numbers: number,
+      }),
+    });
+    const res = await response.json();
+    // console.log(res);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+export const sendMessage = async (message: string, number: string) => {
+  if (nodeEnv !== "production") {
+    return;
+  }
+  try {
+    const response = await fetch("https://www.fast2sms.com/dev/bulkV2", {
+      method: "POST",
+      headers: {
+        authorization:
+          "Spa4dzhmKjxLsGV7t6vXYHgnIBOWl5kF0fDN92Qb3r1ECMR8JA63Gzs21aFcbmnr7BKACLefjXyR9UiZ",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        route: "v3",
+        sender_id: "Pg Rental",
+        message: message,
         language: "english",
         flash: 0,
         numbers: number,

@@ -180,7 +180,6 @@ const getAllListing = catchAsync(
             },
           },
         },
-
         location: true,
         city: true,
       },
@@ -361,10 +360,26 @@ const getAnaliticData = catchAsync(
     });
   }
 );
+const deleteListingById = catchAsync(
+  async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+    const listing = await prisma.resident.findFirst({ where: { id: req.params.id } });
+    if (!listing) {
+      res.status(400).json({
+        message: "City Doesnot exist",
+      });
+    }
+    await prisma.resident.delete({
+      where: { id: req.params.id,},
+    });
+    res.sendStatus(200);
+  }
+);
+
 export default {
   addNewListing,
   getAllListing,
   getAllListingAdmin,
   getListingDetailById,
   getAnaliticData,
+  deleteListingById
 };
