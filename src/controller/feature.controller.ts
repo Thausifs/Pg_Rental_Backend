@@ -47,14 +47,14 @@ const getAllFeature = catchAsync(
 const deleteFeatureById = catchAsync(
   async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
     const feature = await prisma.feature.findFirst({
-      where: {id : req.params.id },
+      where: { id: req.params.id },
     });
     if (!feature) {
       res.status(400).json({
         message: "roomType Doesnot exist",
       });
     }
-    
+
     await prisma.feature.delete({
       where: { id: feature?.id },
     });
@@ -62,9 +62,8 @@ const deleteFeatureById = catchAsync(
   }
 );
 
-
 export default {
   addFeature,
   getAllFeature,
-  deleteFeatureById
+  deleteFeatureById,
 };

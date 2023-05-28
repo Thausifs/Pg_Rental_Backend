@@ -7,12 +7,18 @@ import {
   createUserValidators,
   editUserValidators,
 } from "../validators/user.validators";
+import { imageUpload } from "../middleware/uploadFile.middleware";
 
 const router = Router();
 
 router.use(extractUser, restrictTo(["admin"]));
 
-router.post("/", validateBody(createUserValidators), userController.createUser);
+router.post(
+  "/",
+  imageUpload().fields([{ name: "documentImage", maxCount: 1 }]),
+  validateBody(createUserValidators),
+  userController.createUser
+);
 router.get("/", userController.getAllUsers);
 router.patch(
   "/:id",

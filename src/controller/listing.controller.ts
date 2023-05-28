@@ -124,6 +124,9 @@ const getAllListing = catchAsync(
         },
         AvailAbility: {
           some: {
+            numberOfOccupancies: {
+              gt: 0,
+            },
             roomType: {
               slug: {
                 contains: typeOfRoom,
@@ -204,6 +207,14 @@ const getAllListingAdmin = catchAsync(
       skip: (page - 1) * limit,
       take: limit,
       where: {
+        AvailAbility: {
+          some: {
+            numberOfOccupancies: {
+              gt: 0,
+            },
+          },
+        },
+
         city: {
           slug: {
             contains: city,
@@ -362,14 +373,16 @@ const getAnaliticData = catchAsync(
 );
 const deleteListingById = catchAsync(
   async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
-    const listing = await prisma.resident.findFirst({ where: { id: req.params.id } });
+    const listing = await prisma.resident.findFirst({
+      where: { id: req.params.id },
+    });
     if (!listing) {
       res.status(400).json({
         message: "City Doesnot exist",
       });
     }
     await prisma.resident.delete({
-      where: { id: req.params.id,},
+      where: { id: req.params.id },
     });
     res.sendStatus(200);
   }
@@ -381,5 +394,5 @@ export default {
   getAllListingAdmin,
   getListingDetailById,
   getAnaliticData,
-  deleteListingById
+  deleteListingById,
 };

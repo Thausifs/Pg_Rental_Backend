@@ -3,6 +3,7 @@ import * as z from "zod";
 export const addNewRentPayment = z.object({
   availabilityId: z.string(),
   userId: z.string(),
+  roomNo: z.string(),
 });
 export type addNewRentPaymentType = z.infer<typeof addNewRentPayment>;
 

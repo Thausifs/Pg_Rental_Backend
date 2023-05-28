@@ -1,13 +1,14 @@
 import { NextFunction, Router, Request, Response } from "express";
-import multer from "multer";
 import {
   loginController,
   SignUpHandler,
   userDetailController,
   varifyOtpHandlerForLogin,
   varifyOtpHandlerForResgistration,
+  chnageProfilePicController,
 } from "../controller/auth.controller";
 import extractUser from "../middleware/extractUser.middleware";
+import { imageUpload } from "../middleware/uploadFile.middleware";
 import { validateBody } from "../middleware/validateResource";
 import { createUserValidators } from "../validators/user.validators";
 
@@ -19,4 +20,11 @@ authRouter.post("/login", loginController);
 authRouter.post("/verifyOtpForRegistration", varifyOtpHandlerForResgistration);
 authRouter.post("/verifyOtpForLogin", varifyOtpHandlerForLogin);
 authRouter.get("/me", extractUser, userDetailController);
+authRouter.post(
+  "/me/profilePic",
+  extractUser,
+  imageUpload().fields([{ name: "profilePic", maxCount: 1 }]),
+  chnageProfilePicController
+);
+
 export default authRouter;

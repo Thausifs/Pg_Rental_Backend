@@ -23,6 +23,19 @@ model ProfileImage {
   User         User[]
 }
 
+model DocumentImage {
+  id           String  @id @default(uuid())
+  fieldname    String?
+  originalname String?
+  encoding     String?
+  mimetype     String?
+  destination  String?
+  filename     String?
+  path         String
+  size         Int?
+  User         User[]
+}
+
 model User {
   id              String        @id @default(uuid())
   email           String?
@@ -41,6 +54,8 @@ model User {
   Comment               Comment[]
   RentPaymentSubcriptin RentPaymentSubcriptin[]
   Complain              Complain[]
+  DocumentImage         DocumentImage?          @relation(fields: [documentImageId], references: [id])
+  documentImageId       String?
 }
 
 model Otp {
@@ -268,6 +283,7 @@ model RentPaymentSubcriptin {
   planId            String
   subcriptionId     String            @unique
   cancelComment     String?
+  roomNo            String
   razorpayPaymentId String?
   createdAt         DateTime          @default(now()) @db.Timestamptz(3)
   updatedAt         DateTime          @updatedAt @db.Timestamptz(3)

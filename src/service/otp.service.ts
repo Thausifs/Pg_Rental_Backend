@@ -24,7 +24,7 @@ export const sendOtp = async (otp: string, number: string) => {
       },
       body: JSON.stringify({
         route: "v3",
-        sender_id: "FTWSMS",
+        sender_id: "PG Rental",
         message: `Your Otp is ${otp}`,
         language: "english",
         flash: 0,
@@ -37,7 +37,6 @@ export const sendOtp = async (otp: string, number: string) => {
     console.log(error);
   }
 };
-
 
 export const sendMessage = async (message: string, number: string) => {
   if (nodeEnv !== "production") {

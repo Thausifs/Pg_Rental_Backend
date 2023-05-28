@@ -32,6 +32,9 @@ const extractUser = catchAsync(
       where: {
         phoneNo: decode.number,
       },
+      include:{
+        profile_pic:true
+      }
     });
     if (!user) {
       return next(new AppError("You Are Not into Login! Please login", 401));

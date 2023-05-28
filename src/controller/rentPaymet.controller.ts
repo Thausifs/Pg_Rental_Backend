@@ -72,6 +72,15 @@ const addNewRentPayment = catchAsync(
         availabilityId,
         planId: findAvailability.planIdRazorpay as string,
         userId,
+        roomNo: req.body.roomNo,
+      },
+    });
+    await prisma.availAbility.update({
+      where: {
+        uid: findAvailability.uid,
+      },
+      data: {
+        numberOfOccupancies: findAvailability.numberOfOccupancies - 1,
       },
     });
 

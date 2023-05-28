@@ -12,6 +12,7 @@ import AppError from "../utils/AppError";
 import catchAsync from "../utils/catchAsync";
 import Log from "../utils/logger";
 import { createUserBodyType } from "../validators/user.validators";
+import { multerFiledType } from "../utils/Types/multer.types";
 
 const prisma = new PrismaClient();
 
@@ -229,6 +230,26 @@ export const userDetailController = catchAsync(
         userId: req.user?.id as string,
         number: req.user?.phoneNo as string,
       }),
+    });
+  }
+);
+export const chnageProfilePicController = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const files = req.files as multerFiledType;
+    const file = files["profilePic"];
+    if (!file || file?.length === 0) {
+      return next(new AppError("Profile Pic logo is required", 400));
+    }
+    const newProfilePic = await prisma.profileImage.create({ data: file[0] });
+    const user = await prisma.user.update({
+      where: { id: req.user?.id as string },
+      data: { profile_pic_id: newProfilePic.id },
+      include:{
+        profile_pic:true
+      }
+    });
+    return res.status(httpStatusCode.OK).json({
+      data: user,
     });
   }
 );

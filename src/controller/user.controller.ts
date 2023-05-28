@@ -9,6 +9,7 @@ import {
 } from "../validators/user.validators";
 import AppError from "../utils/AppError";
 import { sendMessage } from "../service/otp.service";
+import { multerFile, multerFiledType } from "../utils/Types/multer.types";
 
 const prisma = new PrismaClient();
 
@@ -18,6 +19,11 @@ const createUser = catchAsync(
     res: Response,
     next: NextFunction
   ) => {
+    const file = req.files as multerFiledType;
+    const image = file["documentImage"];
+    if (!image || image.length === 0) {
+      return next(new AppError("Please provide document image", 400));
+    }
     const { phoneNo } = req.body;
     const user = await prisma.user.findFirst({
       where: {
@@ -29,7 +35,12 @@ const createUser = catchAsync(
         new AppError("Phone Number Alredy Exist", httpStatusCode.BAD_REQUEST)
       );
     }
-    const newUser = await prisma.user.create({ data: req.body });
+    const newDocumentImage = await prisma.documentImage.create({
+      data: image[0],
+    });
+    const newUser = await prisma.user.create({
+      data: { ...req.body, documentImageId: newDocumentImage.id },
+    });
     sendMessage(
       `${newUser.name} Account Created Successfully`,
       newUser.phoneNo
@@ -82,6 +93,10 @@ const getAllUsers = catchAsync(
         id: {
           not: req?.user?.id,
         },
+      },
+      include: {
+        DocumentImage: true,
+        profile_pic: true,
       },
     });
     res.status(200).json({
