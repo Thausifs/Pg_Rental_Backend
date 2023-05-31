@@ -5,7 +5,6 @@ import catchAsync from "../utils/catchAsync";
 import { multerFiledType } from "../utils/Types/multer.types";
 import { addListingType, listingQuery } from "../validators/listing.validator";
 import AppError from "../utils/AppError";
-import { P } from "pino";
 
 const prisma = new PrismaClient();
 
@@ -207,14 +206,6 @@ const getAllListingAdmin = catchAsync(
       skip: (page - 1) * limit,
       take: limit,
       where: {
-        AvailAbility: {
-          some: {
-            numberOfOccupancies: {
-              gt: 0,
-            },
-          },
-        },
-
         city: {
           slug: {
             contains: city,

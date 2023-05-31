@@ -65,15 +65,14 @@ const editAvailability = catchAsync(
         description: findAvailability.roomType.typeOfRoom,
         amount: req.body.price,
       });
-      await prisma.availAbility.updateMany({
+      await prisma.availAbility.update({
         where: {
           uid: id,
-          planIdRazorpay: newPlan,
         },
-        data: req.body,
+        data: {...req.body,planIdRazorpay:newPlan},
       });
     } else {
-      await prisma.availAbility.updateMany({
+      await prisma.availAbility.update({
         where: {
           uid: id,
         },
