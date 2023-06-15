@@ -4,7 +4,12 @@ import AppError from "../utils/AppError";
 const restrictTo = (allowUser: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     console.log(req.user?.role);
+    
+    
+    
     if (allowUser.includes(req?.user?.role as string)) {
+      
+      
       return next();
     }
     next(
