@@ -56,6 +56,7 @@ model User {
   Complain              Complain[]
   DocumentImage         DocumentImage?          @relation(fields: [documentImageId], references: [id])
   documentImageId       String?
+   UserDishes            UserDishes[]
 }
 
 model Otp {
@@ -73,6 +74,7 @@ model City {
   name     String     @unique
   slug     String     @unique
   Resident Resident[]
+  foodmenu Foodmenu[]
 }
 
 model FeatureImage {
@@ -201,6 +203,7 @@ model Resident {
   Schedule_Visit     Schedule_Visit[]
   AdvanceBooking     AdvanceBooking[]
   Comment            Comment[]
+    UserDishes         UserDishes[]
 }
 
 enum ScheduleVisitState {
@@ -333,4 +336,34 @@ model TeamMember {
   twitterUrl        String?
   pic               TeamMemberImage @relation(fields: [teamMemberImageId], references: [id], onDelete: Cascade)
   teamMemberImageId String
+}
+
+
+model Foodmenu {
+  city   City @relation(fields: [cityid], references: [id])
+  cityid  String
+  id         String   @id @default(uuid())
+  menu       Menu[]    
+}
+
+model Menu {
+  date      String   
+  breakfast String[]
+  lunch     String[]   
+  dinner    String[]
+  id        String     @id @default(uuid())
+  foodmenu       Foodmenu     @relation(fields: [foodmenuid], references: [id])
+  foodmenuid     String
+}
+
+model UserDishes {
+  user       User     @relation(fields: [userid], references: [id])
+  userid     String
+  id         String   @id @default(uuid())
+  date       String 
+  foodtype   String
+  dish       String
+  quantity   Int
+  resident   Resident @relation(fields: [residentid], references: [id])
+  residentid String
 }

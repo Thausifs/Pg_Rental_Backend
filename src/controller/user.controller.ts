@@ -1,15 +1,15 @@
-import { NextFunction, query, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-import httpStatusCode from "http-status-codes";
+import { NextFunction, query, Request, Response } from 'express';
+import { PrismaClient } from '@prisma/client';
+import httpStatusCode from 'http-status-codes';
 
-import catchAsync from "../utils/catchAsync";
+import catchAsync from '../utils/catchAsync';
 import {
   createUserBodyType,
   editUserBodyType,
-} from "../validators/user.validators";
-import AppError from "../utils/AppError";
-import { sendMessage } from "../service/otp.service";
-import { multerFile, multerFiledType } from "../utils/Types/multer.types";
+} from '../validators/user.validators';
+import AppError from '../utils/AppError';
+import { sendMessage } from '../service/otp.service';
+import { multerFile, multerFiledType } from '../utils/Types/multer.types';
 
 const prisma = new PrismaClient();
 
@@ -20,9 +20,9 @@ const createUser = catchAsync(
     next: NextFunction
   ) => {
     const file = req.files as multerFiledType;
-    const image = file["documentImage"];
+    const image = file['documentImage'];
     if (!image || image.length === 0) {
-      return next(new AppError("Please provide document image", 400));
+      return next(new AppError('Please provide document image', 400));
     }
     const { phoneNo } = req.body;
     const user = await prisma.user.findFirst({
@@ -32,7 +32,7 @@ const createUser = catchAsync(
     });
     if (user) {
       return next(
-        new AppError("Phone Number Alredy Exist", httpStatusCode.BAD_REQUEST)
+        new AppError('Phone Number Alredy Exist', httpStatusCode.BAD_REQUEST)
       );
     }
     const newDocumentImage = await prisma.documentImage.create({
@@ -77,12 +77,46 @@ const deleteUserDataByUserId = catchAsync(
     res: Response,
     next: NextFunction
   ) => {
-    await prisma.user.delete({
+    const usercapacity = await prisma.user.findFirst({
       where: {
         id: req.params.id,
       },
+      select: {
+        RentPaymentSubcriptin: {
+          
+          select: {
+            availability: {
+             
+              select: {
+                uid: true,
+                numberOfOccupancies: true,
+              },
+            },
+          },
+        },
+      },
     });
-    res.sendStatus(200);
+    // console.log(usercapacity?.RentPaymentSubcriptin[0].availability);
+    const ID = usercapacity?.RentPaymentSubcriptin[0].availability.uid;
+   const availAbilitycount =   usercapacity.RentPaymentSubcriptin[0].availability.numberOfOccupancies;
+    if (usercapacity.RentPaymentSubcriptin[0].availability.numberOfOccupancies >= 0 ) {
+       const usercapacity = await prisma.availAbility.update({
+         where: {
+           uid: ID,
+         },
+         data: {
+           numberOfOccupancies: availAbilitycount+ 1,
+          //  isPaymentSuccess: true,
+         },
+       });
+    }
+      await prisma.user.delete({
+        where: {
+          id: req.params.id,
+        },
+      });
+      res.sendStatus(200);
+      
   }
 );
 

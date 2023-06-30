@@ -1,10 +1,10 @@
-import { Request, Response, NextFunction } from "express";
-import { PrismaClient } from "@prisma/client";
+import { Request, Response, NextFunction } from 'express';
+import { PrismaClient } from '@prisma/client';
 
-import AppError from "../utils/AppError";
+import AppError from '../utils/AppError';
 
-import catchAsync from "../utils/catchAsync";
-import { multerFiledType } from "../utils/Types/multer.types";
+import catchAsync from '../utils/catchAsync';
+import { multerFiledType } from '../utils/Types/multer.types';
 
 const prisma = new PrismaClient();
 
@@ -14,10 +14,12 @@ const addFeature = catchAsync(
     res: Response,
     next: NextFunction
   ) => {
+    console.log('running');
+
     const files = req.files as multerFiledType;
-    const featureImage = files["feature_image"];
+    const featureImage = files['feature_image'];
     if (!featureImage || featureImage?.length === 0) {
-      return next(new AppError("Feature logo is required", 400));
+      return next(new AppError('Feature logo is required', 400));
     }
     const featureLogo = await prisma.featureImage.create({
       data: featureImage[0],
@@ -26,11 +28,11 @@ const addFeature = catchAsync(
       data: {
         feature_name: req.body.feature_name,
         feature_image_id: featureLogo.id,
-        slug: req.body.feature_name.toLowerCase().split(" ").join("_"),
+        slug: req.body.feature_name.toLowerCase().split(' ').join('_'),
       },
     });
     res.status(201).json({
-      status: "success",
+      status: 'success',
       data: newFeature,
     });
   }
@@ -51,7 +53,7 @@ const deleteFeatureById = catchAsync(
     });
     if (!feature) {
       res.status(400).json({
-        message: "roomType Doesnot exist",
+        message: 'roomType Doesnot exist',
       });
     }
 
