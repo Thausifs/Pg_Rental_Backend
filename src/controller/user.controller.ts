@@ -96,7 +96,7 @@ const deleteUserDataByUserId = catchAsync(
         },
       },
     });
-    // console.log(usercapacity?.RentPaymentSubcriptin[0].availability);
+    console.log(usercapacity?.RentPaymentSubcriptin[0].availability);
     const ID = usercapacity?.RentPaymentSubcriptin[0].availability.uid;
    const availAbilitycount =   usercapacity.RentPaymentSubcriptin[0].availability.numberOfOccupancies;
     if (usercapacity.RentPaymentSubcriptin[0].availability.numberOfOccupancies >= 0 ) {
@@ -110,6 +110,14 @@ const deleteUserDataByUserId = catchAsync(
          },
        });
     }
+     
+    const userdishes = await prisma.userDishes.deleteMany({
+      where: {
+        userid: req.params.id,
+      },
+    });
+     
+     
       await prisma.user.delete({
         where: {
           id: req.params.id,

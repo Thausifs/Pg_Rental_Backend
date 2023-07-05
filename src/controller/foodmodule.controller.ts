@@ -285,6 +285,268 @@ const showDishes = catchAsync(
   }
 );
 
+const showDishesDates = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { Residentid, date } = req.body;
+
+    const residents = await prisma.resident.findFirst({
+      where: {
+        id: Residentid,
+      },
+    });
+    
+
+    let createdDate = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD');
+
+    const dates = await prisma.menu.findMany({
+      where: {
+        // date: {
+        //   gte: createdDate,
+        // },
+        foodmenu: {
+          cityid: residents?.cityId,
+        },
+      },
+      select: {
+        date: true,
+        
+      },
+    });
+   
+    
+    let findates = [];
+    const fooddates = () => {
+      for (let i = 0; i <= dates.length; i++) {
+        let Datee = moment(dates[i].date, 'YYYY-MM-DD').format('DD-MM-YYYY');
+       
+        
+        let Datess = new Date(Datee);
+        findates.push(Datess);
+        if (i == dates.length - 1) {
+          
+          
+          return findates;
+        }
+      }
+    };
+    const Dates = await fooddates();
+    
+    // const results = menu.filter((r) => r.menu.length !== 0);
+
+    // const dishes = await prisma.menu.findMany({
+    //   where: {
+    //     id: menu[0].id,
+
+    //   },
+    // });
+
+    
+    res.status(200).json({
+      status: true,
+      data: { dates: dates },
+    });
+  }
+);
+
+const exportfoodordersdata = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { Residentid, date } = req.body;
+
+    let Date = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD');
+
+    // const residents = await prisma.userDishes.findFirst({
+    //   where: {
+    //     residentid: Residentid,
+    //     date: createdDate,
+    //   },
+    // });
+    // console.log(residents);
+
+    const residentbreakfast = await prisma.resident.findMany({
+      where: {
+        id: Residentid,
+      },
+      select: {
+        id: true,
+        name: true,
+        UserDishes: {
+          where: {
+            date: Date,
+            foodtype: 'breakfast',
+          },
+          select: {
+            dish: true,
+            foodtype: true,
+            user: {
+              select: {
+                name: true,
+                RentPaymentSubcriptin: {
+                  select: {
+                    roomNo: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const residentlunch = await prisma.resident.findMany({
+      where: {
+        id: Residentid,
+      },
+      select: {
+        id: true,
+        name: true,
+        UserDishes: {
+          where: {
+            date: Date,
+            foodtype: 'lunch',
+          },
+          select: {
+            dish: true,
+            foodtype: true,
+            user: {
+              select: {
+                name: true,
+                RentPaymentSubcriptin: {
+                  select: {
+                    roomNo: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const residentdinner = await prisma.resident.findMany({
+      where: {
+        id: Residentid,
+      },
+      select: {
+        id: true,
+        name: true,
+        UserDishes: {
+          where: {
+            date: Date,
+            foodtype: 'dinner',
+          },
+          select: {
+            dish: true,
+            foodtype: true,
+            user: {
+              select: {
+                name: true,
+                RentPaymentSubcriptin: {
+                  select: {
+                    roomNo: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const Breakfastdatas = async () => {
+      let datas = [];
+      for (let i = 0; i <= residentbreakfast.length; i++) {
+        let data = {
+          Date: date,
+          Foodtype: 'breakfast',
+          Residentname: residentbreakfast[i].name,
+          Dish: residentbreakfast[i].UserDishes[0].dish,
+          User: residentbreakfast[i].UserDishes[0].user.name,
+          RoomNo:
+            residentbreakfast[i].UserDishes[0].user.RentPaymentSubcriptin[0]
+              .roomNo,
+        };
+        datas.push(data);
+        if (i == residentbreakfast.length - 1) {
+          return datas;
+        }
+      }
+    };
+    const Lunchdatas = async () => {
+      let datas = [];
+      for (let i = 0; i <= residentlunch.length; i++) {
+        let data = {
+          Date: date,
+          Foodtype: 'lunch',
+          Residentname: residentlunch[i].name,
+          Dish: residentlunch[i].UserDishes[0].dish,
+          User: residentlunch[i].UserDishes[0].user.name,
+          RoomNo:
+            residentlunch[i].UserDishes[0].user.RentPaymentSubcriptin[0].roomNo,
+        };
+        datas.push(data);
+        if (i == residentlunch.length - 1) {
+          return datas;
+        }
+      }
+    };
+    const Dinnerdatas = async () => {
+      let datas = [];
+      for (let i = 0; i <= residentdinner.length; i++) {
+        let data = {
+          Date: date,
+          Foodtype: 'dinner',
+          Residentname: residentdinner[i].name,
+          Dish: residentdinner[i].UserDishes[0].dish,
+          User: residentdinner[i].UserDishes[0].user.name,
+          RoomNo:
+            residentdinner[i].UserDishes[0].user.RentPaymentSubcriptin[0]
+              .roomNo,
+        };
+        datas.push(data);
+        if (i == residentdinner.length - 1) {
+          return datas;
+        }
+      }
+    };
+    const breakdatas = await Breakfastdatas();
+    const lunchdatas = await Lunchdatas();
+    const dinnerdatas = await Dinnerdatas();
+
+    const finaldata = await [...breakdatas, ...lunchdatas, ...dinnerdatas];
+    // console.log(breakdatas);
+
+    // let createdDate = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD');
+
+    // const menu = await prisma.menu.findMany({
+    //   where: {
+    //     // date: {
+    //     //   gte: createdDate,
+    //     // },
+    //     foodmenu: {
+    //       cityid: residents?.cityId,
+    //     },
+    //   },
+    //   select: {
+    //     date: true,
+    //   },
+    // });
+
+    // const results = menu.filter((r) => r.menu.length !== 0);
+
+    // const dishes = await prisma.menu.findMany({
+    //   where: {
+    //     id: menu[0].id,
+
+    //   },
+    // });
+
+    // console.log(Dishes);
+    res.status(200).json({
+      status: true,
+      data: finaldata,
+    });
+  }
+);
 const userdishes = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const {
@@ -344,7 +606,7 @@ const userdishes = catchAsync(
           residentid: residentid,
           foodtype: 'breakfast',
           dish: breakfast,
-          quantity: parseInt(bkcount),
+          quantity: 1,
         },
       });
       const Dishess2 = await prisma.userDishes.create({
@@ -354,7 +616,7 @@ const userdishes = catchAsync(
           residentid: residentid,
           foodtype: 'lunch',
           dish: lunch,
-          quantity: parseInt(luncount),
+          quantity: 1,
         },
       });
       const Dishess3 = await prisma.userDishes.create({
@@ -364,7 +626,7 @@ const userdishes = catchAsync(
           residentid: residentid,
           foodtype: 'dinner',
           dish: dinner,
-          quantity: parseInt(dincount),
+          quantity: 1,
         },
       });
 
@@ -446,7 +708,7 @@ const userdishesupdate = catchAsync(
         },
         data: {
           dish: dish,
-          quantity: quantity,
+          quantity: 1,
         },
       });
 
@@ -568,9 +830,7 @@ const dishescountbyresanddateorder = catchAsync(
 const Allordersbydate = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { date, cityId } = req.body;
-    console.log(date);
-
-    console.log(cityId);
+    
 
     // const Orders = await prisma.userDishes.findMany({
     //   where: {
@@ -620,6 +880,7 @@ const Allordersbydate = catchAsync(
           select: {
             dish: true,
             foodtype: true,
+            date: true,
             user: {
               select: {
                 name: true,
@@ -867,93 +1128,174 @@ const Allordersbydate = catchAsync(
 const dishescountbydateandres = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { date, resId } = req.body;
-    const orders = await prisma.userDishes.groupBy({
-      by: ['foodtype', 'dish'],
+    // try {
+    const breakfast = await prisma.userDishes.findMany({
       where: {
         residentid: resId,
         date: date,
+        foodtype: 'breakfast',
       },
-    });
-
-    let finArray: {
-      breakfast?: {
-        user: { name: string; RentPaymentSubcriptin: { roomNo: string }[] };
-      }[];
-      lunch?: {
-        user: { name: string; RentPaymentSubcriptin: { roomNo: string }[] };
-      }[];
-      dinner?: {
-        user: { name: string; RentPaymentSubcriptin: { roomNo: string }[] };
-      }[];
-    }[] = [];
-    let Breakfast: {
-      user: { name: string; RentPaymentSubcriptin: { roomNo: string }[] };
-    }[][] = [];
-    let Dinner: {
-      user: { name: string; RentPaymentSubcriptin: { roomNo: string }[] };
-    }[][] = [];
-    let Lunch: {
-      user: { name: string; RentPaymentSubcriptin: { roomNo: string }[] };
-    }[][] = [];
-    const orderst = await orders.map(
-      async (r, i) => {
-        const data = await prisma.userDishes.findMany({
-          where: {
-            residentid: resId,
-            date: date,
-            foodtype: r.foodtype,
-            dish: r.dish,
-          },
-
+      select: {
+        dish: true,
+        user: {
           select: {
-            dish: true,
-            user: {
+            name: true,
+            RentPaymentSubcriptin: {
               select: {
-                name: true,
-                RentPaymentSubcriptin: {
-                  select: {
-                    roomNo: true,
-                  },
-                },
+                roomNo: true,
               },
             },
           },
-        });
-        if (r.foodtype === 'breakfast') {
-          let element = {
-            breakfast: data,
-            dish: r.dish,
-          };
+        },
+      },
+    });
 
-          let breakfast = await Breakfast.push(data);
-        } else if (r.foodtype === 'lunch') {
-          // let element = {
-          //   lunch: data,
-          // };
+    const lunch = await prisma.userDishes.findMany({
+      where: {
+        residentid: resId,
+        date: date,
+        foodtype: 'lunch',
+      },
+      select: {
+        dish: true,
+        user: {
+          select: {
+            name: true,
+            RentPaymentSubcriptin: {
+              select: {
+                roomNo: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    const dinner = await prisma.userDishes.findMany({
+      where: {
+        residentid: resId,
+        date: date,
+        foodtype: 'dinner',
+      },
+      select: {
+        dish: true,
+        user: {
+          select: {
+            name: true,
+            RentPaymentSubcriptin: {
+              select: {
+                roomNo: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
-          Lunch.push(data);
-          // finArray.push(element);
-        } else if (r.foodtype === 'dinner') {
-          // let element = {
-          //   dinner: data,
-          // };
+    // const orders = await prisma.userDishes.groupBy({
+    //   by: ['foodtype', 'dish'],
+    //   where: {
+    //     residentid: resId,
+    //     date: date,
+    //   },
+    // });
 
-          Dinner.push(data);
+    // let finArray: {
+    //   breakfast?: {
+    //     user: { name: string; RentPaymentSubcriptin: { roomNo: string }[] };
+    //   }[];
+    //   lunch?: {
+    //     user: { name: string; RentPaymentSubcriptin: { roomNo: string }[] };
+    //   }[];
+    //   dinner?: {
+    //     user: { name: string; RentPaymentSubcriptin: { roomNo: string }[] };
+    //   }[];
+    // }[] = [];
+    // let Breakfast: {
+    //   user: { name: string; RentPaymentSubcriptin: { roomNo: string }[] };
+    // }[][] = [];
+    // let Dinner: {
+    //   user: { name: string; RentPaymentSubcriptin: { roomNo: string }[] };
+    // }[][] = [];
+    // let Lunch: {
+    //   user: { name: string; RentPaymentSubcriptin: { roomNo: string }[] };
+    // }[][] = [];
+    // const orderst = await orders.map(
+    //   async (r, i) => {
 
-          // finArray.push(element);
-        }
-        //  return finArray;
-        if (i === orders.length - 1) {
-          res.status(201).json({
-            status: true,
-            data: { Breakfast, Lunch, Dinner },
-            message: 'Order data send',
-          });
-        }
-      }
+    //     const data = await prisma.userDishes.findMany({
+    //       where: {
+    //         residentid: resId,
+    //         date: date,
+    //         foodtype: r.foodtype,
+    //         dish: r.dish,
+    //       },
 
-      // console.log(orderst)
-    );
+    //       select: {
+    //         dish: true,
+    //         user: {
+    //           select: {
+    //             name: true,
+    //             RentPaymentSubcriptin: {
+    //               select: {
+    //                 roomNo: true,
+    //               },
+    //             },
+    //           },
+    //         },
+    //       },
+    //     });
+    //     if (r.foodtype === 'breakfast') {
+    //       let element = {
+    //         breakfast: data,
+    //         dish: r.dish,
+    //       };
+    //       // console.log(data);
+
+    //       let Breakfast = [...data];
+    //       console.log(Breakfast);
+
+    //     } else if (r.foodtype === 'lunch') {
+    //       // let element = {
+    //       //   lunch: data,
+    //       // };
+
+    //       let Lunch = [...data];
+    //       // Lunch.push(...data);
+    //       // finArray.push(element);
+    //     } else if (r.foodtype === 'dinner') {
+    //       // let element = {
+    //       //   dinner: data,
+    //       // };
+
+    //       // Dinner.push(...data);
+    //       let Dinner = [...data];
+    //       // finArray.push(element);
+    //     }
+    //     //  return finArray;
+    //   }
+
+    //   // console.log(orderst)
+    // );
+    // console.log(orderst);
+    // if () {
+    //   res.status(201).json({
+    //     status: true,
+    //     data: { Breakfast, Lunch, Dinner },
+    //     message: 'Order data send',
+    //   });
+    // }
+    res.status(201).json({
+      status: true,
+      data: { breakfast, lunch, dinner },
+      message: 'Order data send',
+    });
+    // } catch (error) {
+    //   res.status(402).json({
+    //     status: false,
+
+    //     message: 'Order data not available',
+    //   });
+    // }
   }
 );
 const dishescountbydate = catchAsync(
@@ -995,7 +1337,7 @@ const dishescountbydate = catchAsync(
         count: data.length,
         dish: r.dish,
       };
-      console.log(element);
+     
 
       finaldata.push(element);
     });
@@ -1055,6 +1397,7 @@ export default {
   addDishes,
   updateDishes,
   showDishes,
+  showDishesDates,
   userdishes,
   showuserdishes,
   userdishesupdate,
@@ -1062,6 +1405,7 @@ export default {
   Residents,
   ShowAllMenus,
   Deletemenu,
+  exportfoodordersdata,
   Userupdateorder,
   Allordersbydate,
   dishescountbydate,
