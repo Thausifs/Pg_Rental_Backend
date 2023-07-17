@@ -1,6 +1,6 @@
 export default {
   port: 1337,
-  NODE_ENV: 'devolopment',
+  NODE_ENV: 'production',
   jwt_secret: 'MyVerySecret@',
   jwt_expires_in: '1d',
   number_of_salt: 10,
