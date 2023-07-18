@@ -13,6 +13,8 @@ import catchAsync from "../utils/catchAsync";
 import Log from "../utils/logger";
 import { createUserBodyType } from "../validators/user.validators";
 import { multerFiledType } from "../utils/Types/multer.types";
+import { otpStorage } from './otpStorage'; 
+
 
 const prisma = new PrismaClient();
 
