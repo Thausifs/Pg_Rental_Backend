@@ -48,6 +48,8 @@ export const SignUpHandler = catchAsync(
         },
       });
       sendOtp(otp, phoneNo);
+      otpStorage.setOtp(otp);
+
       Log.info(otp);
 
       res.status(201).json({
@@ -154,6 +156,8 @@ export const loginController = catchAsync(
       },
     });
     Log.info(otp);
+    otpStorage.setOtp(otp);
+
     res.status(httpStatusCode.OK).json({
       status: true,
       message: "Otp Send Successfully!",
